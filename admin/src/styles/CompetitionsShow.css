@@ -1,0 +1,215 @@
+.competition-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 90px;
+  margin-bottom: 20px;
+}
+
+.competition-container .competition-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.competition-container .competition-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.competition-container .competition-name {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+.competition-container .competition-edition {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #4a4a4a;
+}
+
+.competition-container .competition-info {
+  text-align: center;
+  font-size: 12px;
+  color: #333;
+}
+
+/* ==============================
+   TABLEAU DES CATEGORIES
+   ============================== */
+.categories-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.categories-table th,
+.categories-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.categories-table th {
+  background: #f4f4f4;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* ==============================
+   LIGNES DE CATEGORIE
+   ============================== */
+.category-row {
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.category-row:hover {
+  background: #f1f1f1;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.status-closed {
+  background-color: #4caf50; /* Vert */
+  color: white;
+}
+
+.status-pending {
+  background-color: #ff9800; /* Orange */
+  color: white;
+}
+
+.nominees-container {
+  padding: 0 5px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+.nominees-container.active {
+  display: block;
+}
+
+.nominee-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.nominee-table th,
+.nominee-table td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.nominee-table th {
+  background: #e9ecef;
+  font-weight: bold;
+}
+
+.nominee-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.nominee-item:last-child {
+  border-bottom: none;
+}
+
+/* ==============================
+   DETAILS DES NOMMÉS (FILM + PERSONNES)
+   ============================== */
+.nominee-header {
+  font-size: 14px;
+  font-weight: bold;
+  width: 30%;
+}
+
+.nominee-song {
+  font-size: 12px;
+  color: #555;
+  margin-left: 8px;
+  width: 30%;
+}
+
+.nominee-team {
+  font-size: 12px;
+  color: #666;
+  width: 30%;
+  display: flex;
+  flex-flow: row wrap;
+  gap: 5px;
+}
+
+.nominee-person {
+  background: #eaeaea;
+  padding: 4px 6px;
+  border-radius: 3px;
+}
+
+/* ==============================
+   BOUTONS
+   ============================== */
+.toggle-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.delete-btn {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 6px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #c9302c;
+}
+
+.add-btn {
+  background-color: #0275d8;
+  color: white;
+  border: none;
+  padding: 6px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background-color: #025aa5;
+}
+
+.ten-percent {
+  width: 10%;
+}
+
+.nominee-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}

@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "awards-bets",
+    "slug": "awards-bets",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/oscars-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.romain-portier.awardsbets",
+      "buildNumber": "1.0.0",
+      "scheme": "awardsbets"
+    },
+    "android": {
+      "backgroundColor": "#00000000",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000"
+      },
+      "package": "com.romain_portier.awardsbets"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "54c4df91-65b3-42a1-a839-f5576536df68"
+      }
+    },
+    "owner": "romain_portier"
+  }
+}
