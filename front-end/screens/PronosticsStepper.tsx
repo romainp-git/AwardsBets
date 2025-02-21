@@ -2,12 +2,24 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Switch, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useData } from "../data/data";
-import { Category, Nominee, User, Vote } from "../types/types";
+import { Nominee, User, Vote } from "../types/types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
-import Animated, { interpolate, useAnimatedScrollHandler, useDerivedValue, useSharedValue } from "react-native-reanimated";
-import { deleteVote, getAllVotes, getUserInfos, getUserVotes, submitVotes, updateNomineeOdds } from "../api";
+import Animated, {
+  interpolate,
+  useAnimatedScrollHandler,
+  useDerivedValue,
+  useSharedValue,
+} from "react-native-reanimated";
+import {
+  deleteVote,
+  getAllVotes,
+  getUserInfos,
+  getUserVotes,
+  submitVotes,
+  updateNomineeOdds,
+} from "../api";
 
 export default function PronosticsStepper() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,12 +32,14 @@ export default function PronosticsStepper() {
   const [currentVotes, setCurrentVotes] = useState<Record<string, Vote[]>>({});
 
   const navigation = useNavigation();
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarHeight: number = useBottomTabBarHeight();
   const insets = useSafeAreaInsets();
   const scrollY = useSharedValue(0);
 
   const onScroll = useAnimatedScrollHandler({
-    onScroll: (event) => { scrollY.value = event.contentOffset.y; },
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
   });
 
   const headerOpacity = useDerivedValue(() => {
@@ -38,7 +52,10 @@ export default function PronosticsStepper() {
         const userData: User = await getUserInfos();
         setUser(userData);
       } catch (error) {
-        console.error("Erreur lors de la récupération de l'utilisateur :", error);
+        console.error(
+          "Erreur lors de la récupération de l'utilisateur :",
+          error
+        );
       }
     };
 
@@ -50,14 +67,17 @@ export default function PronosticsStepper() {
       try {
         const userVotes = await getUserVotes();
 
-        const votesByCategory = userVotes.reduce((acc: { [k: string]: Vote[] }, vote: Vote) => {
-          if (!acc[vote.category.id]) acc[vote.category.id] = [];
-          acc[vote.category.id].push(vote);
-          return acc;
-        }, {});
+        const votesByCategory = userVotes.reduce(
+          (acc: { [k: string]: Vote[] }, vote: Vote) => {
+            if (!acc[vote.category.id]) acc[vote.category.id] = [];
+            acc[vote.category.id].push(vote);
+            return acc;
+          },
+          {}
+        );
 
         setVotesFromDB(votesByCategory);
-        setCurrentVotes(votesByCategory); // 🆕 On duplique dans currentVotes
+        setCurrentVotes(votesByCategory);
       } catch (error) {
         console.error("Erreur lors du chargement des votes :", error);
       }
@@ -70,19 +90,27 @@ export default function PronosticsStepper() {
     const votesToDelete: Vote[] = [];
     const votesToAdd: Vote[] = [];
 
-    Object.keys(currentVotes).forEach(categoryId => {
-      const oldVotes = votesFromDB[categoryId] || [];
-      const newVotes = currentVotes[categoryId] || [];
+    Object.keys(currentVotes).forEach((categoryId) => {
+      const oldVotes: Vote[] = votesFromDB[categoryId] || [];
+      const newVotes: Vote[] = currentVotes[categoryId] || [];
 
-      oldVotes.forEach(oldVote => {
-        const isStillValid = newVotes.some(newVote => newVote.nominee.id === oldVote.nominee.id && newVote.type === oldVote.type);
+      oldVotes.forEach((oldVote) => {
+        const isStillValid = newVotes.some(
+          (newVote) =>
+            newVote.nominee.id === oldVote.nominee.id &&
+            newVote.type === oldVote.type
+        );
         if (!isStillValid) {
           votesToDelete.push(oldVote);
         }
       });
 
-      newVotes.forEach(newVote => {
-        const isNew = !oldVotes.some(oldVote => oldVote.nominee.id === newVote.nominee.id && oldVote.type === newVote.type);
+      newVotes.forEach((newVote) => {
+        const isNew: boolean = !oldVotes.some(
+          (oldVote) =>
+            oldVote.nominee.id === newVote.nominee.id &&
+            oldVote.type === newVote.type
+        );
         if (isNew) {
           votesToAdd.push(newVote);
         }
@@ -92,15 +120,15 @@ export default function PronosticsStepper() {
     return { votesToAdd, votesToDelete };
   };
 
-  const handleVote = (nominee: Nominee) => {
+  const handleVote: (nominee: Nominee) => void = (nominee: Nominee) => {
     if (!user) return;
 
     setCurrentVotes((prev) => {
-      let updatedVotes = { ...prev };
+      let updatedVotes: Record<string, Vote[]> = { ...prev };
       let voteType: "winner" | "loser" = selectingWinner ? "winner" : "loser";
-      let categoryVotes = [...(updatedVotes[category.id] || [])];
+      let categoryVotes: Vote[] = [...(updatedVotes[category.id] || [])];
 
-      categoryVotes = categoryVotes.filter(vote => vote.type !== voteType);
+      categoryVotes = categoryVotes.filter((vote) => vote.type !== voteType);
 
       categoryVotes.push({
         id: `${category.id}-${nominee.id}`,
@@ -116,11 +144,15 @@ export default function PronosticsStepper() {
   };
 
   const isCategoryComplete = () => {
-    const categoryVotes = currentVotes[category?.id] || [];
-    const hasWinner = categoryVotes.some(vote => vote.type === "winner");
-    const hasLoser = categoryVotes.some(vote => vote.type === "loser");
+    const categoryVotes: Vote[] = currentVotes[category?.id] || [];
+    const hasWinner: boolean = categoryVotes.some(
+      (vote) => vote.type === "winner"
+    );
+    const hasLoser: boolean = categoryVotes.some(
+      (vote) => vote.type === "loser"
+    );
 
-    return hasWinner && hasLoser; // ✅ Retourne `true` si les deux sont sélectionnés
+    return hasWinner && hasLoser;
   };
 
   const calculateOdds = (votesForNominee: number, totalVotes: number) => {
@@ -136,13 +168,20 @@ export default function PronosticsStepper() {
     try {
       const allVotesData = await getAllVotes();
 
-      for (const category of categories.filter(cat => modifiedCategoryIds.includes(cat.id))) {
-        const categoryVotes = allVotesData.filter((vote: Vote) => vote.type === "winner" && vote.category.id === category.id);
+      for (const category of categories.filter((cat) =>
+        modifiedCategoryIds.includes(cat.id)
+      )) {
+        const categoryVotes = allVotesData.filter(
+          (vote: Vote) =>
+            vote.type === "winner" && vote.category.id === category.id
+        );
         const totalVotes = categoryVotes.length;
         const categoryNominees = category.nominees;
 
         for (const nominee of categoryNominees) {
-          const nomineeVotes = categoryVotes.filter((vote: Vote) => vote.nominee.id === nominee.id).length;
+          const nomineeVotes = categoryVotes.filter(
+            (vote: Vote) => vote.nominee.id === nominee.id
+          ).length;
 
           const newOdds = {
             prevWinnerOdds: nominee.currWinnerOdds,
@@ -151,7 +190,10 @@ export default function PronosticsStepper() {
             currLoserOdds: calculateOdds(totalVotes - nomineeVotes, totalVotes),
           };
 
-          console.log(`🎲 Mise à jour des odds pour ${nominee.movie?.title}:`, newOdds);
+          console.log(
+            `🎲 Mise à jour des odds pour ${nominee.movie?.title}:`,
+            newOdds
+          );
           await updateNomineeOdds(nominee.id, newOdds);
         }
       }
@@ -164,7 +206,6 @@ export default function PronosticsStepper() {
     navigation.goBack();
   };
 
-  // Passer à la catégorie suivante
   const goToNextCategory = async () => {
     if (!user) return;
 
@@ -182,7 +223,9 @@ export default function PronosticsStepper() {
           await submitVotes(votesToAdd);
         }
 
-        const modifiedCategories = [...new Set(votesToAdd.map(vote => vote.category.id))];
+        const modifiedCategories = [
+          ...new Set(votesToAdd.map((vote) => vote.category.id)),
+        ];
         await updateAllNomineesOdds(modifiedCategories);
         navigation.goBack();
       } catch (error) {
@@ -198,21 +241,27 @@ export default function PronosticsStepper() {
   };
 
   return (
-    <View className="bg-zinc-900 flex-1 relative" >
-      <Animated.ScrollView 
-        className="flex-1 p-4" 
-        style={{ paddingTop: insets.top + 50, }} 
+    <View className="bg-zinc-900 flex-1 relative">
+      <Animated.ScrollView
+        className="flex-1 p-4"
+        style={Platform.OS === "ios" ? { paddingTop: insets.top + 50 } : {}}
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={16}
       >
-        <Text className="text-2xl font-bold text-center mb-4 text-white" style={{ fontFamily: "FuturaHeavy" }}>
+        <Text
+          className="text-2xl font-bold text-center mb-4 text-white"
+          style={{ fontFamily: "FuturaHeavy" }}
+        >
           {category?.name}
         </Text>
 
-        {/* Switch Winner / Loser */}
         <View className="flex-row items-center justify-center mb-4 gap-3">
-          <Text className={`text-lg font-bold ${selectingWinner ? "text-yellow-500" : "text-gray-400"}`}>
+          <Text
+            className={`text-lg font-bold ${
+              selectingWinner ? "text-yellow-500" : "text-gray-400"
+            }`}
+          >
             Lauréat
           </Text>
           <Switch
@@ -221,47 +270,61 @@ export default function PronosticsStepper() {
             onValueChange={() => setSelectingWinner(!selectingWinner)}
             value={!selectingWinner}
           />
-          <Text className={`text-lg font-bold ${!selectingWinner ? "text-white" : "text-gray-400"}`}>
+          <Text
+            className={`text-lg font-bold ${
+              !selectingWinner ? "text-white" : "text-gray-400"
+            }`}
+          >
             Perdant
           </Text>
         </View>
 
         <Text className="text-lg text-center text-gray-400 mb-2">
-          {selectingWinner ? "Sélectionnez le lauréat" : "Sélectionnez un perdant"}
+          {selectingWinner
+            ? "Sélectionnez le lauréat"
+            : "Sélectionnez un perdant"}
         </Text>
 
         {category?.nominees.map((nominee: Nominee) => {
-          const categoryVotes = currentVotes[category?.id] || []; // Récupère bien les votes de la catégorie actuelle
+          const categoryVotes = currentVotes[category?.id] || [];
 
-          const isWinner = categoryVotes.some(vote => vote.type === "winner" && vote.nominee.id === nominee.id);
-          const isLoser = categoryVotes.some(vote => vote.type === "loser" && vote.nominee.id === nominee.id);
-          const isDisabled = (selectingWinner && isLoser) || (!selectingWinner && isWinner);
+          const isWinner = categoryVotes.some(
+            (vote) => vote.type === "winner" && vote.nominee.id === nominee.id
+          );
+          const isLoser = categoryVotes.some(
+            (vote) => vote.type === "loser" && vote.nominee.id === nominee.id
+          );
+          const isDisabled =
+            (selectingWinner && isLoser) || (!selectingWinner && isWinner);
 
           let nomineeTextParts: [string, string] = ["", ""];
 
           if (category.type === "movie") {
-            // Pour un film, titre + réalisateur
             nomineeTextParts = [
               nominee.movie?.title || "Titre inconnu",
-              `de ${nominee.team.find((member: { roles: string[]; }) => member.roles.includes("director"))?.person.name || "Réalisateur inconnu"}`
+              `de ${
+                nominee.team.find((member: { roles: string[] }) =>
+                  member.roles.includes("director")
+                )?.person.name || "Réalisateur inconnu"
+              }`,
             ];
           } else if (category.type === "actor") {
             // Pour une personne, nom + film
             nomineeTextParts = [
               nominee.team[0]?.person.name || "Nom inconnu",
-              nominee.movie?.title || "Film inconnu"
+              nominee.movie?.title || "Film inconnu",
             ];
           } else if (category.type === "other") {
             // Pour une personne, nom + film
             nomineeTextParts = [
               nominee.team[0]?.person.name || "Nom inconnu",
-              nominee.movie?.title || "Film inconnu"
+              nominee.movie?.title || "Film inconnu",
             ];
           } else if (category.type === "song") {
             // Pour une chanson, titre + film
             nomineeTextParts = [
               nominee.song || "Titre inconnu",
-              nominee.movie?.title || "Film inconnu"
+              nominee.movie?.title || "Film inconnu",
             ];
           }
 
@@ -271,57 +334,87 @@ export default function PronosticsStepper() {
               onPress={() => !isDisabled && handleVote(nominee)}
               disabled={isDisabled}
               className={`p-3 border border-[#B3984C] mb-2 ${
-                isWinner ? "bg-yellow-700/30 border border-yellow-500" : isLoser ? "border-gray-500 bg-gray-600" : "bg-zinc-800  border-zinc-900 rounded-md"
+                isWinner
+                  ? "bg-yellow-700/30 border border-yellow-500"
+                  : isLoser
+                  ? "border-gray-500 bg-gray-600"
+                  : "bg-zinc-800  border-zinc-900 rounded-md"
               } ${isDisabled ? "opacity-50" : ""}`}
             >
-              <Text className="text-white font-bold">{nomineeTextParts[0]}</Text>
+              <Text className="text-white font-bold">
+                {nomineeTextParts[0]}
+              </Text>
               <Text className="text-white">{nomineeTextParts[1]}</Text>
             </TouchableOpacity>
           );
         })}
 
-        <View className="flex-row justify-between mt-4 gap-2">
-          {currentIndex > 0 ? (
-            <>
-              <TouchableOpacity
-                onPress={goToPreviousCategory}
-                className="py-3 px-6 border border-[#B3984C] w-1/2"
-              >
-                <Text className="text-xl text-[#B3984C] font-bold text-center" style={{ fontFamily: "FuturaHeavy" }}>
-                  Précédent
-                </Text>
-              </TouchableOpacity>
+        <View className="flex-1" style={{ paddingBottom: tabBarHeight }}>
+          <View className="flex-row justify-between mt-4 gap-2">
+            {currentIndex > 0 ? (
+              <>
+                <TouchableOpacity
+                  onPress={goToPreviousCategory}
+                  className="py-3 px-6 border border-[#B3984C] w-1/2"
+                >
+                  <Text
+                    className="text-xl text-[#B3984C] font-bold text-center"
+                    style={{ fontFamily: "FuturaHeavy" }}
+                  >
+                    Précédent
+                  </Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={isCategoryComplete() ? goToNextCategory : () => {}}
-                className={`py-3 px-6 w-1/2 ${isCategoryComplete() ? "bg-[#B3984C]" : "bg-gray-500 opacity-50"}`}
-                disabled={!isCategoryComplete()}
-              >
-                <Text className="text-xl text-white font-bold text-center" style={{ fontFamily: "FuturaHeavy" }}>
-                  {currentIndex < categories.length - 1 ? "Suivant" : "Terminer"}
-                </Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <View className="flex-1">
-              <TouchableOpacity
-                onPress={isCategoryComplete() ? goToNextCategory : () => {}}
-                className={`py-3 px-6 w-full ${isCategoryComplete() ? "bg-[#B3984C]" : "bg-gray-500 opacity-50"}`}
-                disabled={!isCategoryComplete()}
-              >
-                <Text className="text-xl text-white font-bold text-center" style={{ fontFamily: "FuturaHeavy" }}>
-                  {currentIndex < categories.length - 1 ? "Suivant" : "Terminer"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
+                <TouchableOpacity
+                  onPress={isCategoryComplete() ? goToNextCategory : () => {}}
+                  className={`py-3 px-6 w-1/2 ${
+                    isCategoryComplete()
+                      ? "bg-[#B3984C]"
+                      : "bg-gray-500 opacity-50"
+                  }`}
+                  disabled={!isCategoryComplete()}
+                >
+                  <Text
+                    className="text-xl text-white font-bold text-center"
+                    style={{ fontFamily: "FuturaHeavy" }}
+                  >
+                    {currentIndex < categories.length - 1
+                      ? "Suivant"
+                      : "Terminer"}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <View className="flex-1">
+                <TouchableOpacity
+                  onPress={isCategoryComplete() ? goToNextCategory : () => {}}
+                  className={`py-3 px-6 w-full ${
+                    isCategoryComplete()
+                      ? "bg-[#B3984C]"
+                      : "bg-gray-500 opacity-50"
+                  }`}
+                  disabled={!isCategoryComplete()}
+                >
+                  <Text
+                    className="text-xl text-white font-bold text-center"
+                    style={{ fontFamily: "FuturaHeavy" }}
+                  >
+                    {currentIndex < categories.length - 1
+                      ? "Suivant"
+                      : "Terminer"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
+          <TouchableOpacity
+            onPress={cancelVoting}
+            className="mt-2 py-2 items-center"
+          >
+            <Text className="text-gray-400 text-lg underline">Annuler</Text>
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity onPress={cancelVoting} className="mt-2 py-2 items-center">
-          <Text className="text-gray-400 text-lg underline">Annuler</Text>
-        </TouchableOpacity>
-
-        <View style={{ height: Platform.OS === "android" ? (tabBarHeight + 100) : tabBarHeight }}></View>
       </Animated.ScrollView>
 
       <Animated.View
