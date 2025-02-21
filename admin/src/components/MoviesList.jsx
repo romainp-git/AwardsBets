@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getMovies, deleteMovie } from "../api";
-import "../styles/MoviesList.css"; // ✅ Fichier CSS pour le style
+import "../styles/MoviesList.css";
 
 const MoviesList = () => {
   const [movies, setMovies] = useState([]);
@@ -35,11 +35,20 @@ const MoviesList = () => {
       <div className="movies-grid">
         {movies.map((movie) => (
           <div key={movie.id} className="movie-card">
-            <img src={movie.poster} alt={movie.title} className="movie-poster" />
+            <img
+              src={movie.poster}
+              alt={movie.title}
+              className="movie-poster"
+            />
             <div className="movie-info">
               <h3>{movie.title}</h3>
               <p>Sortie : {movie.releaseDate}</p>
-              <button className="delete-btn" onClick={() => handleDelete(movie.id)}>🗑️ Supprimer</button>
+              <button
+                className="delete-btn"
+                onClick={() => handleDelete(movie.id)}
+              >
+                🗑️ Supprimer
+              </button>
             </div>
           </div>
         ))}

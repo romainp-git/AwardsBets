@@ -72,7 +72,7 @@ const UserVotesSection: React.FC<{
         </View>
         <View className="flex flex-row gap-2">
           <CoteCard cote={selectedWinner.currWinnerOdds} previousCote={selectedWinner.prevWinnerOdds} label="Winner" />
-          <CoteCard cote={selectedWinner.currLoserOdds} previousCote={selectedWinner.currLoserOdds} label="Loser" />
+          <CoteCard cote={selectedWinner.currLoserOdds} previousCote={selectedWinner.prevLoserOdds} label="Loser" />
         </View>
       </View>
       <View className="border-r border-[#B3984C] h-full"></View>

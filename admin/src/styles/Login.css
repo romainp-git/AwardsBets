@@ -1,0 +1,78 @@
+/* Conteneur principal du formulaire */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* Carte du formulaire */
+.login-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 40px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 4px 10px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Titre du formulaire */
+.login-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #b3984c;
+}
+
+/* Champs de saisie */
+.login-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  outline: none;
+  margin-bottom: 15px;
+  transition: border 0.3s;
+  box-sizing: border-box;
+}
+
+.login-input:focus {
+  border-color: #b3984c;
+}
+
+/* Bouton de connexion */
+.login-button {
+  background-color: #b3984c;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+.login-button:hover {
+  background-color: #877032;
+}
+
+/* Lien d'inscription */
+.login-footer {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.login-footer a {
+  color: #b3984c;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.login-footer a:hover {
+  color: #877032;
+}
