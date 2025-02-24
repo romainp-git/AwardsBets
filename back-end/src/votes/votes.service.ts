@@ -1,4 +1,8 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Vote } from './entities/vote.entity';
@@ -27,30 +31,48 @@ export class VotesService {
     return votes;
   }
 
-  async voteBatch(user: User, votes: VoteDto[] ) {
+  async voteBatch(user: User, votes: VoteDto[]) {
     const newVotes: Vote[] = [];
 
     for (const voteDto of votes) {
-        const { nomineeId, categoryId, type } = voteDto;
+      const { nomineeId, categoryId, type } = voteDto;
 
-        const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
-        if (!category) { throw new NotFoundException(`Catégorie avec l'ID ${categoryId} introuvable`) }
+      const category = await this.categoryRepository.findOne({
+        where: { id: categoryId },
+      });
+      if (!category) {
+        throw new NotFoundException(
+          `Catégorie avec l'ID ${categoryId} introuvable`,
+        );
+      }
 
-        const nominee = await this.nomineeRepository.findOne({ where: { id: nomineeId } });
-        if (!nominee) { throw new NotFoundException(`Nominé avec l'ID ${nomineeId} introuvable`) }
+      const nominee = await this.nomineeRepository.findOne({
+        where: { id: nomineeId },
+      });
+      if (!nominee) {
+        throw new NotFoundException(
+          `Nominé avec l'ID ${nomineeId} introuvable`,
+        );
+      }
 
-        const existingVote = await this.voteRepository.findOne({ where: { nominee, user } });
-        if (existingVote) { throw new ConflictException(`Vous avez déjà voté pour le nommé ID ${nomineeId}`) }
-        const newVote = this.voteRepository.create({
-            nominee,
-            user,
-            category,
-            type,
-        });
+      const existingVote = await this.voteRepository.findOne({
+        where: { nominee, user },
+      });
+      if (existingVote) {
+        throw new ConflictException(
+          `Vous avez déjà voté pour le nommé ID ${nomineeId}`,
+        );
+      }
+      const newVote = this.voteRepository.create({
+        nominee,
+        user,
+        category,
+        type,
+      });
 
-        newVotes.push(newVote);
+      newVotes.push(newVote);
     }
-    
+
     return this.voteRepository.save(newVotes);
   }
 
@@ -60,7 +82,7 @@ export class VotesService {
       relations: ['category', 'nominee', 'user'],
     });
   }
-  
+
   async deleteVote(voteId: number) {
     const vote = await this.voteRepository.findOne({ where: { id: voteId } });
 

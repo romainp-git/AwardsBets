@@ -1,13 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(
-    private jwtService: JwtService,
-    private reflector: Reflector,
-  ) {}
+  constructor(private jwtService: JwtService) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
@@ -24,7 +26,7 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const decoded = this.jwtService.verify(token);
-      request.user = decoded; // On attache l'utilisateur à la requête
+      request.user = decoded;
       return true;
     } catch (error) {
       return false;

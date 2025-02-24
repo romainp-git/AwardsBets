@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
@@ -22,4 +23,5 @@ async function bootstrap() {
   const host = process.env.HOST || 'localhost';
   await app.listen(port, host);
 }
+
 bootstrap();

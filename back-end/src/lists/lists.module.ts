@@ -11,13 +11,9 @@ import { AuthModule } from 'src/auth/auth.module';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Movie, User, List]),
-    AuthModule,
-  ],
-  controllers: [ ListsController ],
-  providers: [ ListsService, JwtAuthGuard ],
-  exports: [ ListsService ],
+  imports: [TypeOrmModule.forFeature([Movie, User, List]), AuthModule],
+  controllers: [ListsController],
+  providers: [ListsService, JwtAuthGuard],
+  exports: [ListsService],
 })
-
 export class ListsModule {}

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, NotFoundException, Delete } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  NotFoundException,
+  Delete,
+} from '@nestjs/common';
 import { MoviesService } from './movies.service';
 import { Movie } from './entities/movie.entity';
 import { TmdbService } from '../tmdb/tmdb.service'; // ✅ On garde juste le service TMDB
@@ -13,7 +23,7 @@ export class MoviesController {
 
   // ✅ Liste tous les films en base
   @Get()
-  async findAll(): Promise<Movie[]> { 
+  async findAll(): Promise<Movie[]> {
     return this.moviesService.findAll();
   }
 
@@ -21,7 +31,8 @@ export class MoviesController {
   @Delete(':id')
   async deleteMovie(@Param('id') id: number) {
     const result = await this.moviesService.deleteMovie(id);
-    if (!result) throw new NotFoundException(`Le film avec l'ID ${id} n'existe pas.`);
+    if (!result)
+      throw new NotFoundException(`Le film avec l'ID ${id} n'existe pas.`);
     return { message: 'Film supprimé avec succès' };
   }
 
@@ -46,8 +57,8 @@ export class MoviesController {
   async getMovieDetails(@Param('tmdbId') tmdbId: number) {
     console.log(`Fetching details for TMDB ID: ${tmdbId}`);
     const movieData = await this.tmdbService.getMovieDetails(tmdbId);
-    console.log("Données envoyées", movieData);
-    
+    console.log('Données envoyées', movieData);
+
     if (!movieData) {
       throw new NotFoundException(`Film TMDB ID ${tmdbId} introuvable`);
     }

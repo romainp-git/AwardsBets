@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Unique, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  Unique,
+  Column,
+} from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Nominee } from 'src/nominees/entities/nominee.entity';
 import { Category } from 'src/categories/entities/category.entity';
@@ -20,12 +26,14 @@ export class Vote {
   @ManyToOne(() => Nominee, (nominee) => nominee.votes, { onDelete: 'CASCADE' })
   nominee: Nominee;
 
-  @ManyToOne(() => Category, (category) => category.votes, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Category, (category) => category.votes, {
+    onDelete: 'CASCADE',
+  })
   category: Category;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: VoteType,
   })
-  type: VoteType; 
+  type: VoteType;
 }

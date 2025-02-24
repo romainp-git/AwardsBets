@@ -4,19 +4,12 @@
     "slug": "awards-bets",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/oscars-logo.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.romain-portier.awardsbets",
-      "buildNumber": "1.0.0",
-      "scheme": "awardsbets"
+      "buildNumber": "1.0.0"
     },
     "android": {
       "backgroundColor": "#00000000",
@@ -31,6 +24,25 @@
       "bundler": "metro"
     },
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#000",
+          "image": "./assets/logo-ab.png",
+          "imageWidth": 300,
+          "ios": {
+            "backgroundColor": "#000",
+            "image": "./assets/logo-ab.png",
+            "resizeMode": "cover"
+          },
+          "android": {
+            "backgroundColor": "#0c7cff",
+            "image": "./assets/logo-ab.png",
+            "imageWidth": 150
+          }
+        }
+      ],
+      "expo-secure-store",
       "expo-font"
     ],
     "extra": {

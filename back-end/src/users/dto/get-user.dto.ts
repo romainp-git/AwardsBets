@@ -1,27 +1,27 @@
 import { IsEmail, IsInt, IsNumber, IsString } from 'class-validator';
 
 export class GetUserDto {
-    @IsInt()
-    id: number;
+  @IsInt()
+  id: number;
 
-    @IsString()
-    username: string;
+  @IsString()
+  username: string;
 
-    @IsString()
-    photo: string;
+  @IsString()
+  photo: string;
 
-    @IsString()
-    avatar: string;
+  @IsString()
+  avatar: string;
 
-    @IsString()
-    color: string;
+  @IsString()
+  color: string;
 
-    @IsNumber()
-    score: number;
+  @IsNumber()
+  score: number;
 
-    @IsEmail()
-    email: string;
+  @IsEmail()
+  email: string;
 
-    @IsString()
-    description: string;
+  @IsString()
+  description: string;
 }

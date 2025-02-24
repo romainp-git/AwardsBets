@@ -1,7 +1,24 @@
-import { Controller, Post, Body, BadRequestException, Get, Param, Res, UseGuards, UseInterceptors, UploadedFile, Patch, Delete } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import {
+  Controller,
+  Post,
+  Body,
+  BadRequestException,
+  Get,
+  Param,
+  Res,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Patch,
+  Delete,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 
@@ -11,13 +28,17 @@ import { extname, join } from 'path';
 
 import { Response } from 'express';
 import { createReadStream, existsSync } from 'fs';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('uploads')
 export class UploadsController {
   @Get(':filename')
-  async getUploadedFile(@Param('filename') filename: string, @Res() res: Response) {
+  async getUploadedFile(
+    @Param('filename') filename: string,
+    @Res() res: Response,
+  ) {
     const filePath = join(__dirname, '..', '..', 'uploads', filename);
-    console.log("📂 Fichier demandé:", filePath);
+    console.log('📂 Fichier demandé:', filePath);
 
     if (!existsSync(filePath)) {
       return res.status(404).json({ message: 'Fichier introuvable' });
@@ -30,79 +51,85 @@ export class UploadsController {
 
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
-    @Post('register')
-    async register(@Body() createUserDto: CreateUserDto) {
-        try {
-            return await this.usersService.create(createUserDto);
-        } catch (error) {
-            throw new BadRequestException(error.message);
-        }
+  @Post('register')
+  async register(@Body() createUserDto: CreateUserDto) {
+    try {
+      return await this.usersService.create(createUserDto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @Post('register-push-token')
+  @UseGuards(JwtAuthGuard)
+  async registerPushToken(
+    @CurrentUser() user,
+    @Body() { expoPushToken }: { expoPushToken: string },
+  ) {
+    if (!expoPushToken) {
+      throw new BadRequestException('Token de notification requis');
     }
 
-    @Post("register-push-token")
-    @UseGuards(AuthGuard("jwt"))
-    async registerPushToken(@CurrentUser() user, @Body() { expoPushToken }: { expoPushToken: string }) {
-        if (!expoPushToken) {
-            throw new BadRequestException("Token de notification requis");
-        }
-        
-        await this.usersService.savePushToken(user.id, expoPushToken);
-        return { message: "Push token enregistré avec succès" };
-    }
+    await this.usersService.savePushToken(user.id, expoPushToken);
+    return { message: 'Push token enregistré avec succès' };
+  }
 
-    @Get()
-    async getAllUsers() {
-        return this.usersService.findAll();
-    }
+  @Get()
+  async getAllUsers() {
+    return this.usersService.findAll();
+  }
 
-    @Patch("/reset-scores")
-    async resetAllScores() {
-        return this.usersService.resetAllScore();
-    }
+  @Patch('/reset-scores')
+  async resetAllScores() {
+    return this.usersService.resetAllScore();
+  }
 
-    @UseGuards(AuthGuard('jwt'))
-    @Get('infos')
-    async getUserInfos(
-        @CurrentUser() user 
-    ) {
-        return this.usersService.findOne(user);
-    }
+  @UseGuards(JwtAuthGuard)
+  @Get('infos')
+  async getUserInfos(@CurrentUser() user) {
+    return this.usersService.findOne(user.id);
+  }
 
-    @UseGuards(AuthGuard('jwt'))
-    @UseInterceptors(FileInterceptor('photo', {
-        storage: diskStorage({
-            destination: './uploads',
-            filename: (req, file, cb) => {
-                const fileExt = extname(file.originalname);
-                const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${fileExt}`;
-                cb(null, fileName);
-            },
-        }),
-        limits: { fileSize: 10 * 1024 * 1024 },
-    }))
-    @Patch('update-profile')
-    async updateUserProfile(
-        @CurrentUser() user,
-        @UploadedFile() file: Multer.File,
-        @Body() updateUserDto: UpdateUserDto,
-    ) {
-        console.log("📥 Données reçues:", updateUserDto);
-        console.log("📸 Fichier reçu:", file);
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const fileExt = extname(file.originalname);
+          const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${fileExt}`;
+          cb(null, fileName);
+        },
+      }),
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
+  @Patch('update-profile')
+  async updateUserProfile(
+    @CurrentUser() user,
+    @UploadedFile() file: Multer.File,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    console.log('📥 Données reçues:', updateUserDto);
+    console.log('📸 Fichier reçu:', file);
 
-        const fileUrl = file ? `https://awards-bets.fr/uploads/${file.filename}` : user.photo;
+    const fileUrl = file
+      ? `https://awards-bets.fr/uploads/${file.filename}`
+      : user.photo;
 
-        return this.usersService.updateUser(user.id, { ...updateUserDto, photo: fileUrl });
-    }
+    return this.usersService.updateUser(user.id, {
+      ...updateUserDto,
+      photo: fileUrl,
+    });
+  }
 
-    @UseGuards(AuthGuard('jwt'))
-    @Delete('delete-photo')
-    async deletePhoto(
-        @CurrentUser() user
-    ) {
-        console.log("📥 User reçu pour supp photo:", user);
-        await this.usersService.deleteUserPhoto(user.id);
-        return { message: "Photo supprimée avec succès" };
-    }
+  @UseGuards(JwtAuthGuard)
+  @Delete('delete-photo')
+  async deletePhoto(@CurrentUser() user) {
+    console.log('📥 User reçu pour supp photo:', user);
+    await this.usersService.deleteUserPhoto(user.id);
+    return { message: 'Photo supprimée avec succès' };
+  }
 }

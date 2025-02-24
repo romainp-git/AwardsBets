@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsArray, ValidateNested, IsDate, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateMovieDto {
@@ -41,6 +41,6 @@ export class CreateMovieDto {
   @IsOptional()
   @IsNumber()
   duration?: number;
-  
+
   credits: any;
 }

@@ -10,10 +10,18 @@ import { Person } from 'src/persons/entities/person.entity';
 import { MoviePerson } from 'src/movies/entities/movieperson.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Competition, Category, Nominee, Movie, Person, MoviePerson])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Competition,
+      Category,
+      Nominee,
+      Movie,
+      Person,
+      MoviePerson,
+    ]),
+  ],
   controllers: [CompetitionsController],
-  providers: [CompetitionsService], 
+  providers: [CompetitionsService],
   exports: [CompetitionsService],
 })
-
 export class CompetitionsModule {}

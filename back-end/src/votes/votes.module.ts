@@ -9,13 +9,9 @@ import { AuthModule } from 'src/auth/auth.module';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ Vote, Nominee, Category ]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Vote, Nominee, Category]), AuthModule],
   controllers: [VotesController],
-  providers: [VotesService, JwtAuthGuard], 
+  providers: [VotesService, JwtAuthGuard],
   exports: [VotesService],
 })
-
 export class VotesModule {}

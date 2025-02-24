@@ -429,7 +429,12 @@ export default function PronosticsStepper() {
           opacity: headerOpacity,
         }}
       >
-        <BlurView intensity={50} tint="dark" style={{ flex: 1 }} />
+        <BlurView
+          intensity={50}
+          tint="dark"
+          style={{ flex: 1 }}
+          experimentalBlurMethod={"dimezisBlurView"}
+        />
       </Animated.View>
     </View>
   );

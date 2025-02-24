@@ -1,8 +1,8 @@
-import { IsArray, IsNumber, IsString } from "class-validator";
+import { IsArray, IsNumber, IsString } from 'class-validator';
 
 export class CreateNomineeDto {
   @IsNumber()
-  movie: number; 
+  movie: number;
 
   @IsArray()
   team: number[];

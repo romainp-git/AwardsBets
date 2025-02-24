@@ -1,12 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, Image, Pressable, Animated, Dimensions, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  Animated,
+  Dimensions,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserInfos } from "../api";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types/types"; 
+import { RootStackParamList } from "../types/types";
 import { useUser } from "../context/UserContext";
 
 const screenWidth = Dimensions.get("window").width;
@@ -33,6 +41,7 @@ const Header: React.FC<HeaderProps> = ({ navigation, setIsAuthenticated }) => {
     const fetchUserInfos = async () => {
       const fetchedUser = await getUserInfos();
       setUser(fetchedUser);
+      console.log("🔍 User récupéré :", fetchedUser);
     };
     fetchUserInfos();
   }, []);
@@ -70,7 +79,10 @@ const Header: React.FC<HeaderProps> = ({ navigation, setIsAuthenticated }) => {
 
   return (
     <View>
-      <View className="absolute flex-row justify-between items-center px-4 z-10 w-full" style={{ paddingTop: insets.top }}>
+      <View
+        className="absolute flex-row justify-between items-center px-4 z-10 w-full"
+        style={{ paddingTop: insets.top }}
+      >
         <View className="flex-row items-center gap-5">
           {user?.photo ? (
             <Image
@@ -85,7 +97,9 @@ const Header: React.FC<HeaderProps> = ({ navigation, setIsAuthenticated }) => {
               <Text className="text-white text-lg">{user?.avatar || "🙂"}</Text>
             </View>
           )}
-          <Text className="text-white text-lg font-bold">Hello {user?.username}</Text>
+          <Text className="text-white text-lg font-bold">
+            Hello {user?.username}
+          </Text>
         </View>
 
         <Pressable onPress={openMenu}>
@@ -133,7 +147,9 @@ const Header: React.FC<HeaderProps> = ({ navigation, setIsAuthenticated }) => {
         <Text className="text-white text-xl font-bold mb-4">Menu</Text>
 
         <Pressable onPress={() => navigation.navigate("EditProfile")}>
-          <Text className="text-white text-lg font-bold mb-3">Modifier mon profil</Text>
+          <Text className="text-white text-lg font-bold mb-3">
+            Modifier mon profil
+          </Text>
         </Pressable>
 
         <Pressable onPress={handleLogout}>

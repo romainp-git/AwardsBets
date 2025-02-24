@@ -9,12 +9,16 @@ export class CategoriesService {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
   ) {}
-  
+
   async deleteCategory(categoryId: number) {
-    const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
 
     if (!category) {
-      throw new NotFoundException(`Catégorie avec l'ID ${categoryId} introuvable`);
+      throw new NotFoundException(
+        `Catégorie avec l'ID ${categoryId} introuvable`,
+      );
     }
 
     await this.categoryRepository.delete(categoryId);

@@ -14,7 +14,6 @@ import { VotesModule } from './votes/votes.module';
 import { TmdbService } from './tmdb/tmdb.service';
 import { ListsModule } from './lists/lists.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -28,7 +27,6 @@ import { ListsModule } from './lists/lists.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    AuthModule,
     CategoriesModule,
     CompetitionsModule,
     ListsModule,
@@ -36,7 +34,8 @@ import { ListsModule } from './lists/lists.module';
     NomineesModule,
     PersonsModule,
     UsersModule,
-    VotesModule
+    AuthModule,
+    VotesModule,
   ],
   providers: [TmdbService],
 })

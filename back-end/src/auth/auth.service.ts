@@ -1,4 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
@@ -7,7 +14,8 @@ import { LoginUserDto } from 'src/users/dto/login-user.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 

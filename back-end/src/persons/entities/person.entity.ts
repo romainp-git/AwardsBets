@@ -1,5 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Nominee } from 'src/nominees/entities/nominee.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { MoviePerson } from 'src/movies/entities/movieperson.entity';
 
 @Entity()
@@ -13,7 +19,9 @@ export class Person {
   @Column({ nullable: true })
   photo: string;
 
-  @OneToMany(() => MoviePerson, (moviePerson) => moviePerson.person, { cascade: true })
+  @OneToMany(() => MoviePerson, (moviePerson) => moviePerson.person, {
+    cascade: true,
+  })
   movies: MoviePerson[];
 
   // ✅ Date de création (ajoutée automatiquement)
