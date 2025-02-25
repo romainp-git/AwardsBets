@@ -12,12 +12,12 @@ import { ListType } from './entities/list.entity';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { ListItemDto } from './dto/list-item.dto';
 import { User } from 'src/users/entities/user.entity';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthGuard } from 'src/auth/Guards/auth.guard';
 
 @Controller('lists')
 export class ListsController {
   constructor(private readonly listsService: ListsService) {}
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Post()
   async addToList(@CurrentUser() user, @Body() listItem: ListItemDto) {
     console.log(
@@ -29,13 +29,13 @@ export class ListsController {
     return this.listsService.addToList(user as User, listItem);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Delete()
   async removeFromList(@CurrentUser() user, @Body() listItem: ListItemDto) {
     return this.listsService.removeFromList(user as User, listItem);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Get(':type')
   async getUserList(@CurrentUser() user, @Param('type') type: ListType) {
     return this.listsService.getUserList(user as User, type);

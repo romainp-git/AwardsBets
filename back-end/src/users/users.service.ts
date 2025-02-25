@@ -52,7 +52,6 @@ export class UsersService {
     }
 
     const user = this.userRepository.create(createUserDto);
-    await user.hashPassword();
     await this.userRepository.save(user);
 
     return { success: true, message: 'Compte créé avec succès !' };

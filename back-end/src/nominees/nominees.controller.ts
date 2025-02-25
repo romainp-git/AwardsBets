@@ -15,7 +15,7 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { VoteDto } from './dto/vote.dto';
 import { UpdateOddsDto } from './dto/update-odds.dto';
 import { User } from 'src/users/entities/user.entity';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthGuard } from 'src/auth/Guards/auth.guard';
 
 @Controller('nominees')
 export class NomineesController {
@@ -31,7 +31,7 @@ export class NomineesController {
     return this.nomineesService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Post(':id/vote')
   async voteForNominee(
     @Param('id') nomineeId: number,

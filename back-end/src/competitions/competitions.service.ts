@@ -31,13 +31,11 @@ export class CompetitionsService {
     private readonly moviePersonRepository: Repository<MoviePerson>,
   ) {}
 
-  // ✅ Créer une compétition
   async create(createCompetitionDto: CreateCompetitionDto) {
     const competition = this.competitionRepository.create(createCompetitionDto);
     return await this.competitionRepository.save(competition);
   }
 
-  // ✅ Récupérer toutes les compétitions avec leurs catégories et nominés
   async findAll() {
     const competitions = await this.competitionRepository.find({
       relations: [
@@ -80,7 +78,6 @@ export class CompetitionsService {
     };
   }
 
-  // ✅ Supprimer une compétition
   async remove(id: number) {
     const competition = await this.competitionRepository.findOne({
       where: { id },
@@ -94,7 +91,6 @@ export class CompetitionsService {
     return { message: 'Compétition supprimée avec succès' };
   }
 
-  // ✅ Ajouter une catégorie à une compétition
   async addCategory(
     competitionId: number,
     createCategoryDto: CreateCategoryDto,
@@ -109,16 +105,42 @@ export class CompetitionsService {
       );
     }
 
+    const maxPosition = competition.categories.length
+      ? Math.max(...competition.categories.map((c) => c.position))
+      : 0;
+
     const category = this.categoryRepository.create({
       ...createCategoryDto,
       competition,
       nominees: [],
+      position: maxPosition + 1,
     });
 
     return await this.categoryRepository.save(category);
   }
 
-  // ✅ Ajouter un nommé à une catégorie
+  async reorderCategories(
+    competitionId: number,
+    newOrder: { categoryId: number; position: number }[],
+  ) {
+    const competition = await this.competitionRepository.findOne({
+      where: { id: competitionId },
+      relations: ['categories'],
+    });
+
+    if (!competition) {
+      throw new NotFoundException(
+        `Compétition avec l'ID ${competitionId} introuvable`,
+      );
+    }
+
+    for (const { categoryId, position } of newOrder) {
+      await this.categoryRepository.update(categoryId, { position });
+    }
+
+    return { message: 'Ordre des catégories mis à jour avec succès' };
+  }
+
   async addNominee(categoryId: number, createNomineeDto: CreateNomineeDto) {
     const category = await this.categoryRepository.findOne({
       where: { id: categoryId },

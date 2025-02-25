@@ -11,7 +11,7 @@ import { VotesService } from './votes.service';
 import { VoteDto } from './dto/vote.dto';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { User } from 'src/users/entities/user.entity';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthGuard } from 'src/auth/Guards/auth.guard';
 
 @Controller('votes')
 export class VotesController {
@@ -23,14 +23,14 @@ export class VotesController {
   }
 
   @Get('user')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   async getVotesByUser(@CurrentUser() user: User) {
     console.log('le user est', user);
     return this.votesService.findByUser(user);
   }
 
   @Post('batch')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   async voteBatch(@Body() votes: VoteDto[], @CurrentUser() user) {
     const formatedVotes: VoteDto[] = Object.values(votes).flat();
     return this.votesService.voteBatch(user as User, formatedVotes);

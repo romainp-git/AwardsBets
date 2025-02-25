@@ -7,7 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { Category } from 'src/categories/entities/category.entity';
 import { Vote } from 'src/votes/entities/vote.entity';
 import { User } from 'src/users/entities/user.entity';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthGuard } from 'src/auth/Guards/auth.guard';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
     AuthModule,
   ],
   controllers: [NomineesController],
-  providers: [NomineesService, JwtAuthGuard],
+  providers: [NomineesService, AuthGuard],
   exports: [NomineesService],
 })
 export class NomineesModule {}

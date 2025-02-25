@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,6 +9,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Vote } from 'src/votes/entities/vote.entity';
@@ -65,16 +71,15 @@ export class User {
 
   @OneToMany(() => List, (list) => list.user)
   lists: List[];
+
+  @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword() {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      this.password = await bcrypt.hash(this.password, 10);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      }
-      console.error('An unknown error occurred:', error);
-      throw new Error('Failed to hash password');
+    if (this.password) {
+      const salt: number = 10;
+      this.password = await bcrypt.hash(this.password, salt);
     }
   }
 }
+
+export type SafeUser = Omit<User, 'password' | 'hashPassword'>;

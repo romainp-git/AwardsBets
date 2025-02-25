@@ -7,6 +7,7 @@ import HomeScreen from "../screens/HomeScreen";
 import ClassementScreen from "../screens/ClassementScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ListsScreen from "../screens/ListsScreen";
+import { LeaguesStack } from "./LeaguesStack";
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +19,7 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ cachedImages }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        animation: 'fade',
+        animation: "fade",
         headerShown: false,
         tabBarActiveTintColor: "white",
         tabBarShowLabel: true,
@@ -29,14 +30,20 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ cachedImages }) => {
           borderTopWidth: 0,
         },
         tabBarBackground: () => (
-          <BlurView intensity={40} tint="dark" className="absolute bottom-0 left-0 right-0 h-full w-full" experimentalBlurMethod={"dimezisBlurView"}/>
+          <BlurView
+            intensity={40}
+            tint="dark"
+            className="absolute bottom-0 left-0 right-0 h-full w-full"
+            experimentalBlurMethod={"dimezisBlurView"}
+          />
         ),
         tabBarIcon: ({ color, size, focused }) => {
           let iconName: string | undefined;
 
           if (route.name === "Home") iconName = "home";
           else if (route.name === "Pronostics") iconName = "clipboard";
-          else if (route.name === "Classement") iconName = "trophy";
+          else if (route.name === "Ligues") iconName = "trophy";
+          else if (route.name === "Classement") iconName = "podium";
           else if (route.name === "Listes") iconName = "list";
 
           return (
@@ -62,7 +69,12 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ cachedImages }) => {
                   />
                 </View>
               )}
-              <Ionicons name={iconName as keyof typeof Ionicons.glyphMap} size={size} color={color} style={{ zIndex: 10 }} />
+              <Ionicons
+                name={iconName as keyof typeof Ionicons.glyphMap}
+                size={size}
+                color={color}
+                style={{ zIndex: 10 }}
+              />
             </View>
           );
         },
@@ -70,8 +82,12 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ cachedImages }) => {
         tabBarHideOnKeyboard: true,
       })}
     >
-      <Tab.Screen name="Home" children={() => <HomeScreen cachedImages={cachedImages} />} />
+      <Tab.Screen
+        name="Home"
+        children={() => <HomeScreen cachedImages={cachedImages} />}
+      />
       <Tab.Screen name="Pronostics" component={PronosticsStack} />
+      <Tab.Screen name="Ligues" component={LeaguesStack} />
       <Tab.Screen name="Classement" component={ClassementScreen} />
       <Tab.Screen name="Listes" component={ListsScreen} />
     </Tab.Navigator>

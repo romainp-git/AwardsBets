@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { View, Image, Text, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
@@ -17,6 +17,7 @@ import Animated, {
 
 import { useData } from "../data/data";
 import { Movie } from "../types/types";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen({
   cachedImages,
@@ -38,6 +39,12 @@ export default function HomeScreen({
   const openMovieDetails = (movie: Movie) => {
     setSelectedMovie(movie);
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      setSelectedMovie(null);
+    }, [])
+  );
 
   const scrollY = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler((event) => {

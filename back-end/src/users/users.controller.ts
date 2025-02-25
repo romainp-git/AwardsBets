@@ -28,7 +28,7 @@ import { extname, join } from 'path';
 
 import { Response } from 'express';
 import { createReadStream, existsSync } from 'fs';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthGuard } from 'src/auth/Guards/auth.guard';
 
 @Controller('uploads')
 export class UploadsController {
@@ -63,7 +63,7 @@ export class UsersController {
   }
 
   @Post('register-push-token')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   async registerPushToken(
     @CurrentUser() user,
     @Body() { expoPushToken }: { expoPushToken: string },
@@ -86,13 +86,13 @@ export class UsersController {
     return this.usersService.resetAllScore();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Get('infos')
   async getUserInfos(@CurrentUser() user) {
     return this.usersService.findOne(user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
@@ -125,7 +125,7 @@ export class UsersController {
     });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard)
   @Delete('delete-photo')
   async deletePhoto(@CurrentUser() user) {
     console.log('📥 User reçu pour supp photo:', user);

@@ -26,6 +26,9 @@ export class Category {
   @Column()
   name: string;
 
+  @Column({ default: 0 })
+  position: number;
+
   @Column({
     type: 'enum',
     enum: CategoryType,
