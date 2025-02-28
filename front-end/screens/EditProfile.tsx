@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, TextInput, Image, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import { deleteUserPhoto, getUserInfos, updateUserProfile } from "../api";
@@ -71,7 +78,17 @@ const EditProfile: React.FC = () => {
     await updateUserProfile(updatedUser);
     refreshUser();
     navigation.goBack();
-  }, [user, email, description, photo, selectedAvatar, color, setUser, refreshUser, navigation]);
+  }, [
+    user,
+    email,
+    description,
+    photo,
+    selectedAvatar,
+    color,
+    setUser,
+    refreshUser,
+    navigation,
+  ]);
 
   const handleDeletePhoto = useCallback(async () => {
     if (!photo) return;
@@ -82,31 +99,44 @@ const EditProfile: React.FC = () => {
       refreshUser();
       alert("Photo supprimée avec succès.");
     } catch (error) {
-      console.error("Erreur lors de la suppression de la photo:", error);
+      console.log("Erreur lors de la suppression de la photo:", error);
       alert("Impossible de supprimer la photo.");
     }
   }, [photo, refreshUser]);
 
   return (
-    <ScrollView className="flex-1 bg-gray-900 px-5 py-8" style={{ paddingTop: insets.top + 50 }}>
-      <Text className="text-white text-2xl font-bold text-center mb-6">Modifier mon profil</Text>
+    <ScrollView
+      className="flex-1 bg-gray-900 px-5 py-8"
+      style={{ paddingTop: insets.top + 50 }}
+    >
+      <Text className="text-white text-2xl font-bold text-center mb-6">
+        Modifier mon profil
+      </Text>
 
       <View className="items-center mb-6">
         {photo ? (
           <Image source={{ uri: photo }} className="w-32 h-32 rounded-full" />
         ) : (
-          <View className="w-32 h-32 rounded-full flex items-center justify-center" style={{ backgroundColor: color }}>
+          <View
+            className="w-32 h-32 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: color }}
+          >
             <Text className="text-4xl">{selectedAvatar}</Text>
           </View>
         )}
 
         <View className="flex-row gap-4 mt-4">
-          <TouchableOpacity onPress={pickImage} className="bg-[#B3984C] py-2 px-4 rounded">
+          <TouchableOpacity
+            onPress={pickImage}
+            className="bg-[#B3984C] py-2 px-4 rounded"
+          >
             <Text className="text-white">Choisir une photo</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleDeletePhoto}
-            className={`py-2 px-4 rounded ${photo ? "bg-red-500" : "bg-gray-500 opacity-50"}`}
+            className={`py-2 px-4 rounded ${
+              photo ? "bg-red-500" : "bg-gray-500 opacity-50"
+            }`}
             disabled={!photo}
           >
             <Text className="text-white">Supprimer</Text>
@@ -158,11 +188,17 @@ const EditProfile: React.FC = () => {
         ))}
       </View>
 
-      <TouchableOpacity onPress={handleSave} className="bg-[#B3984C] py-3 items-center">
+      <TouchableOpacity
+        onPress={handleSave}
+        className="bg-[#B3984C] py-3 items-center"
+      >
         <Text className="text-white font-bold text-lg">Sauvegarder</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.goBack()} className="py-3 items-center">
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        className="py-3 items-center"
+      >
         <Text className="text-white text-md underline">Annuler</Text>
       </TouchableOpacity>
     </ScrollView>

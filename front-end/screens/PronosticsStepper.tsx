@@ -27,7 +27,8 @@ export default function PronosticsStepper() {
   const [selectingWinner, setSelectingWinner] = useState(true);
   const [user, setUser] = useState<User | null>(null);
 
-  const { categories } = useData();
+  const { categories: rawCategories } = useData();
+  const categories = [...rawCategories].sort((a, b) => a.position - b.position);
   const category = categories[currentIndex];
   const [currentVotes, setCurrentVotes] = useState<Record<string, Vote[]>>({});
 
@@ -52,10 +53,7 @@ export default function PronosticsStepper() {
         const userData: User = await getUserInfos();
         setUser(userData);
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération de l'utilisateur :",
-          error
-        );
+        console.log("Erreur lors de la récupération de l'utilisateur :", error);
       }
     };
 
@@ -79,7 +77,7 @@ export default function PronosticsStepper() {
         setVotesFromDB(votesByCategory);
         setCurrentVotes(votesByCategory);
       } catch (error) {
-        console.error("Erreur lors du chargement des votes :", error);
+        console.log("Erreur lors du chargement des votes :", error);
       }
     };
 
@@ -198,7 +196,7 @@ export default function PronosticsStepper() {
         }
       }
     } catch (error) {
-      console.error("❌ Erreur lors de la mise à jour des odds :", error);
+      console.log("❌ Erreur lors de la mise à jour des odds :", error);
     }
   };
 
@@ -229,7 +227,7 @@ export default function PronosticsStepper() {
         await updateAllNomineesOdds(modifiedCategories);
         navigation.goBack();
       } catch (error) {
-        console.error("Erreur lors de l'envoi des votes :", error);
+        console.log("Erreur lors de l'envoi des votes :", error);
       }
     }
   };

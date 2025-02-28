@@ -10,7 +10,6 @@ import {
   UpdateDateColumn,
   OneToMany,
   BeforeInsert,
-  BeforeUpdate,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Vote } from 'src/votes/entities/vote.entity';
@@ -73,7 +72,6 @@ export class User {
   lists: List[];
 
   @BeforeInsert()
-  @BeforeUpdate()
   async hashPassword() {
     if (this.password) {
       const salt: number = 10;

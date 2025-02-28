@@ -1,26 +1,19 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import { login } from "../api";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
 import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "../context/AuthContext";
 
-type AuthScreenProps = {
-  setIsAuthenticated: (value: boolean) => void;
-};
-
-const AuthScreen: React.FC<AuthScreenProps> = ({ setIsAuthenticated }) => {
+const AuthScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     try {
-      const token = await login(username, password);
-      console.log(token);
-      if (token) {
-        setIsAuthenticated(true);
-      }
+      await login(username, password);
     } catch (error) {
       console.log(error);
       Alert.alert("Erreur", "Email ou mot de passe incorrect.");

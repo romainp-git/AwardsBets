@@ -97,6 +97,7 @@ export class CompetitionsService {
   ) {
     const competition = await this.competitionRepository.findOne({
       where: { id: competitionId },
+      relations: ['categories'],
     });
 
     if (!competition) {
@@ -121,7 +122,7 @@ export class CompetitionsService {
 
   async reorderCategories(
     competitionId: number,
-    newOrder: { categoryId: number; position: number }[],
+    categoriesOrder: { categoryId: number; position: number }[],
   ) {
     const competition = await this.competitionRepository.findOne({
       where: { id: competitionId },
@@ -134,7 +135,7 @@ export class CompetitionsService {
       );
     }
 
-    for (const { categoryId, position } of newOrder) {
+    for (const { categoryId, position } of categoriesOrder) {
       await this.categoryRepository.update(categoryId, { position });
     }
 

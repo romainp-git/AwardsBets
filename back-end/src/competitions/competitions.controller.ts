@@ -1,8 +1,17 @@
-import { Controller, Post, Get, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { CompetitionsService } from './competitions.service';
 import { CreateCompetitionDto } from './dto/create-competition.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CreateNomineeDto } from './dto/create-nominee.dto';
+import { ReorderCategoriesDto } from './dto/reorder-categories.dto';
 
 @Controller('competitions')
 export class CompetitionsController {
@@ -50,5 +59,16 @@ export class CompetitionsController {
     @Body() createNomineeDto: CreateNomineeDto,
   ) {
     return this.competitionsService.addNominee(categoryId, createNomineeDto);
+  }
+
+  @Patch(':id/categories/order')
+  async reorderCategories(
+    @Param('id') competitionId: number,
+    @Body() reorderCategoriesDto: ReorderCategoriesDto,
+  ) {
+    return this.competitionsService.reorderCategories(
+      competitionId,
+      reorderCategoriesDto.categoriesOrder,
+    );
   }
 }

@@ -1,28 +1,58 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import { ListType, User, Vote } from "./types/types";
 import * as FileSystem from "expo-file-system";
-import * as SecureStore from "expo-secure-store";
+import { Alert } from "react-native";
+import { globalLogout } from "./context/AuthContext";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-// Stocker un token
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      const token = await getToken();
+
+      if (token) {
+        console.warn("❌ Token expiré ou invalide, déconnexion...");
+        await removeToken();
+
+        Alert.alert(
+          "Session expirée",
+          "Votre session a expiré, veuillez vous reconnecter.",
+          [{ text: "OK" }]
+        );
+      }
+    }
+
+    globalLogout?.();
+
+    return Promise.reject(error);
+  }
+);
+
+// 📌 Stocker le token de manière sécurisée
 export const storeToken = async (token: string) => {
   await SecureStore.setItemAsync("authToken", token);
 };
 
-// Récupérer le token
+// 📌 Récupérer le token
 export const getToken = async () => {
   return await SecureStore.getItemAsync("authToken");
 };
 
-// Supprimer le token
+// 📌 Supprimer le token
 export const removeToken = async () => {
   await SecureStore.deleteItemAsync("authToken");
 };
 
-const getAuthHeaders = async () => {
-  const token = await AsyncStorage.getItem("authToken");
+// 📌 Générer les headers d'authentification
+export const getAuthHeaders = async () => {
+  const token = await getToken();
   if (!token) throw new Error("Aucun token JWT trouvé");
 
   return {
@@ -30,48 +60,68 @@ const getAuthHeaders = async () => {
   };
 };
 
+// 📌 Vérifier l'authentification de l'utilisateur
+export const checkUserAuth = async () => {
+  try {
+    const token = await getToken();
+    if (!token) return null;
+
+    const response = await api.get(`/auth/me`, await getAuthHeaders());
+
+    return response.data; // Retourne les infos du user si valide
+  } catch (error) {
+    console.log("❌ Erreur lors de la vérification du token :", error);
+    return null;
+  }
+};
+
+// 📌 Inscription
 export const register = async (userData: {
   username: string;
   email: string;
   password: string;
 }) => {
-  console.log("Données envoyées :", userData);
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/users/register`,
-      userData
-    );
-    console.log("Inscription réussie :", response.data);
+    const response = await api.post(`/users/register`, userData);
+
+    if (response.data?.success) {
+      const token = await loginUser(userData.username, userData.password);
+      return { success: true, token };
+    }
+
     return response.data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      return {
-        success: false,
-        message: error.response.data.message || "Erreur lors de l'inscription",
-      };
-    }
     return {
       success: false,
-      message: "Erreur inattendue. Veuillez réessayer.",
+      message: "Erreur lors de l'inscription. Veuillez réessayer.",
     };
   }
 };
 
-export const login = async (username: string, password: string) => {
+// 📌 Connexion
+export const loginUser = async (username: string, password: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+    const response = await api.post(`/auth/login`, {
       username,
       password,
     });
     const token = response.data.access_token;
-    await AsyncStorage.setItem("authToken", token);
+    console.log("🔍 Token :", token);
+    await storeToken(token);
 
     return token;
   } catch (error) {
+    console.log("🔍 Erreur lors de la connexion :", error);
     throw error;
   }
 };
 
+// 📌 Déconnexion
+export const logoutUser = async () => {
+  await removeToken();
+};
+
+// 📌 Soumettre des votes
 export const submitVotes = async (votes: Vote[]) => {
   try {
     const formattedVotes = Object.values(votes)
@@ -84,8 +134,8 @@ export const submitVotes = async (votes: Vote[]) => {
 
     console.log("Données envoyées :", formattedVotes);
 
-    await axios.post(
-      `${API_BASE_URL}/votes/batch`,
+    await api.post(
+      `/votes/batch`,
       { votes: formattedVotes },
       await getAuthHeaders()
     );
@@ -97,36 +147,32 @@ export const submitVotes = async (votes: Vote[]) => {
   }
 };
 
+// 📌 Récupérer tous les votes
 export const getAllVotes = async () => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/votes`,
-      await getAuthHeaders()
-    );
-
+    const response = await api.get(`/votes`, await getAuthHeaders());
     return response.data;
   } catch (error) {
-    console.log("Erreur lors de la récupération des votes :", error);
+    console.log("❌ Erreur lors de la récupération des votes :", error);
     throw error;
   }
 };
 
+// 📌 Récupérer tous les utilisateurs
 export const getAllUsers = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/users`);
+    const response = await api.get(`/users`);
     return response.data;
   } catch (error) {
-    console.log("Erreur lors de la récupération des users :", error);
+    console.log("❌ Erreur lors de la récupération des utilisateurs :", error);
     throw error;
   }
 };
 
+// 📌 Récupérer les infos du user
 export const getUserInfos = async () => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/users/infos`,
-      await getAuthHeaders()
-    );
+    const response = await api.get(`/users/infos`, await getAuthHeaders());
     return response.data;
   } catch (error) {
     console.log("Erreur lors de la récupération des infos du user :", error);
@@ -134,12 +180,10 @@ export const getUserInfos = async () => {
   }
 };
 
+// 📌 Récupérer tous les votes de l'utilisateur
 export const getUserVotes = async () => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/votes/user/`,
-      await getAuthHeaders()
-    );
+    const response = await api.get(`/votes/user/`, await getAuthHeaders());
 
     if (!response.data || response.data.length === 0) {
       console.log("ℹ Aucun vote trouvé pour cet utilisateur.");
@@ -158,55 +202,49 @@ export const getUserVotes = async () => {
   }
 };
 
-export const getNominees = async () => {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/nominees`,
-      await getAuthHeaders()
-    );
-
-    return response.data;
-  } catch (error) {
-    console.log("Erreur lors de la récupération des nommés :", error);
-    throw error;
-  }
-};
-
+// 📌 Supprimer un vote
 export const deleteVote = async (voteId: number | string) => {
   try {
-    await axios.delete(
-      `${API_BASE_URL}/votes/${voteId}`,
-      await getAuthHeaders()
-    );
-    console.log(`Vote ${voteId} supprimé avec succès`);
+    await api.delete(`/votes/${voteId}`, await getAuthHeaders());
+    console.log(`✅ Vote ${voteId} supprimé`);
   } catch (error) {
-    console.log(`Erreur lors de la suppression du vote ${voteId} :`, error);
+    console.log(`❌ Erreur lors de la suppression du vote ${voteId} :`, error);
     throw error;
   }
 };
 
+// 📌 Récupérer les nommés
+export const getNominees = async () => {
+  try {
+    const response = await api.get(`/nominees`, await getAuthHeaders());
+    return response.data;
+  } catch (error) {
+    console.log("❌ Erreur lors de la récupération des nommés :", error);
+    throw error;
+  }
+};
+
+// 📌 Mettre à jour les cotes d’un nominé
 export const updateNomineeOdds = async (
   nomineeId: number | string,
   odds: Record<string, number>
 ) => {
   try {
-    await axios.patch(
-      `${API_BASE_URL}/nominees/${nomineeId}/odds`,
+    await api.patch(
+      `/nominees/${nomineeId}/odds`,
       odds,
       await getAuthHeaders()
     );
-    console.log(`✅ Odds mises à jour pour le nominé ${nomineeId}`);
+    console.log(`✅ Cotes mises à jour pour le nominé ${nomineeId}`);
   } catch (error) {
-    console.log(
-      `❌ Erreur lors de la mise à jour des odds pour ${nomineeId} :`,
-      error
-    );
+    console.log(`❌ Erreur lors de la mise à jour des cotes :`, error);
   }
 };
 
+// 📌 Mettre à jour le profil utilisateur
 export const updateUserProfile = async (user: User) => {
   try {
-    const token = await AsyncStorage.getItem("authToken");
+    const token = await getToken();
     if (!token) throw new Error("Aucun token JWT trouvé");
 
     console.log("🔍 User envoyé :", user);
@@ -225,7 +263,6 @@ export const updateUserProfile = async (user: User) => {
         fileInfo.size &&
         fileInfo.size > 10 * 1024 * 1024
       ) {
-        // 10 Mo
         alert(
           "La taille de l'image dépasse 10 Mo. Veuillez choisir une image plus petite."
         );
@@ -243,7 +280,7 @@ export const updateUserProfile = async (user: User) => {
 
     console.log("📤 FormData final :", formData);
 
-    await axios.patch(`${API_BASE_URL}/users/update-profile`, formData, {
+    await api.patch(`/users/update-profile`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -266,66 +303,58 @@ export const updateUserProfile = async (user: User) => {
   }
 };
 
+// 📌 Supprimer la photo de l’utilisateur
 export const deleteUserPhoto = async () => {
-  await axios.delete(
-    `${API_BASE_URL}/users/delete-photo`,
-    await getAuthHeaders()
-  );
+  await api.delete(`/users/delete-photo`, await getAuthHeaders());
 };
 
-// 🔵 Ajouter un film à une liste
+// 📌 Récupérer une liste spécifique d’un utilisateur
+export const getUserList = async (type: ListType) => {
+  try {
+    const response = await api.get(`/lists/${type}`, await getAuthHeaders());
+    return response.data;
+  } catch (error) {
+    console.log("❌ Erreur lors de la récupération de la liste :", error);
+    return [];
+  }
+};
+
+// 📌 Ajouter un film à une liste
 export const addToList = async (movieId: number, type: ListType) => {
   try {
-    console.log("🔍 Ajout du film", movieId, "à la liste", type);
-    const response = await axios.post(
-      `${API_BASE_URL}/lists`,
+    const response = await api.post(
+      `/lists`,
       { movieId, type },
       await getAuthHeaders()
     );
-
     return response.data;
   } catch (error) {
-    console.error("❌ Erreur lors de l'ajout à la liste :", error);
+    console.log("❌ Erreur lors de l'ajout à la liste :", error);
     return null;
   }
 };
 
-// 🔴 Supprimer un film d'une liste
+// 📌 Supprimer un film d'une liste
 export const removeFromList = async (movieId: number, type: ListType) => {
   try {
-    console.log("🔍 Retrait du film", movieId, "à la liste", type);
-    const response = await axios.delete(`${API_BASE_URL}/lists`, {
+    const response = await api.delete(`/lists`, {
       data: { movieId, type },
       ...(await getAuthHeaders()),
     });
     return response.data;
   } catch (error) {
-    console.error("❌ Erreur lors de la suppression de la liste :", error);
+    console.log("❌ Erreur lors de la suppression de la liste :", error);
     return null;
   }
 };
 
-// 🟢 Récupérer une liste d'un type spécifique
-export const getUserList = async (type: ListType) => {
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/lists/${type}`,
-      await getAuthHeaders()
-    );
-    return response.data;
-  } catch (error) {
-    console.error("❌ Erreur lors de la récupération de la liste :", error);
-    return [];
-  }
-};
-
-// 🟠 Vérifier si un film est déjà dans une liste
+// 📌 Vérifier si un film est déjà dans une liste
 export const isMovieInList = async (movieId: number, type: ListType) => {
   try {
     const list = await getUserList(type);
     return list.some((item: any) => item.movie.id === movieId);
   } catch (error) {
-    console.error("❌ Erreur lors de la vérification de la liste :", error);
+    console.log("❌ Erreur lors de la vérification de la liste :", error);
     return false;
   }
 };

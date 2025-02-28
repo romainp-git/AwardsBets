@@ -136,15 +136,17 @@ export default function HomeScreen({
         </View>
 
         <View className="">
-          {categories.map((category) => (
-            <CategorySection
-              key={category.id}
-              category={category}
-              movies={movies}
-              onMoviePress={openMovieDetails}
-              cachedImages={cachedImages}
-            />
-          ))}
+          {categories
+            .sort((a, b) => a.position - b.position)
+            .map((category) => (
+              <CategorySection
+                key={category.id}
+                category={category}
+                movies={movies}
+                onMoviePress={openMovieDetails}
+                cachedImages={cachedImages}
+              />
+            ))}
         </View>
 
         <View style={{ marginBottom: insets.bottom + 50 }}></View>

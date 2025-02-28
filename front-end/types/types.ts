@@ -1,5 +1,3 @@
-import { RouteProp } from "@react-navigation/native";
-
 export interface Person {
   id: string;
   name: string;
@@ -49,8 +47,8 @@ export interface Nominee {
 export interface Competition {
   id: string;
   name: string;
-  edition:string;
-  date:Date;
+  edition: string;
+  date: Date;
   startTime: string;
   endTime: string;
   venue: string;
@@ -63,9 +61,10 @@ export interface Competition {
 export interface Category {
   id: string;
   name: string;
-  votes:Vote[];
+  votes: Vote[];
   type: "movie" | "actor" | "song" | "other";
   nominees: Nominee[];
+  position: number;
 }
 
 export interface Vote {
@@ -83,9 +82,16 @@ export interface User {
   email: string;
   votes: Vote[];
   score: number;
-  color: string | "#B3984C";
+  color: string | "#B3984C";
   avatar: string | "👤";
   description: string;
+}
+
+export interface League {
+  id: string;
+  name: string;
+  members: string[];
+  competitions: string[];
 }
 
 export type RootStackParamList = {

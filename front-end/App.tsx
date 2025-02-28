@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./global.css";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -21,6 +20,7 @@ import * as SplashScreen from "expo-splash-screen";
 
 import { UserProvider, useUser } from "./context/UserContext";
 import usePushNotifications from "./context/UsePushNotifications";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 const Stack = createStackNavigator();
 
@@ -32,14 +32,29 @@ SplashScreen.setOptions({
 });
 
 export default function App() {
+  return (
+    <GestureHandlerRootView>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <UserProvider>
+            <PaperProvider>
+              <MainNavigator />
+            </PaperProvider>
+          </UserProvider>
+        </AuthProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}
+
+const MainNavigator = () => {
+  const { isAuthenticated } = useAuth();
   const [appIsReady, setAppIsReady] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [cachedImages, setCachedImages] = useState<{ [key: string]: string }>(
     {}
   );
   const { user } = useUser();
-
-  const { movies, people, loading } = useData();
+  const { movies, people } = useData();
 
   const [fontsLoaded] = useFonts({
     FuturaBook: require("./assets/fonts/FuturaBook.ttf"),
@@ -81,12 +96,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const token = await AsyncStorage.getItem("authToken");
-      setIsAuthenticated(!!token);
-      setAppIsReady(true);
-    };
-
     const preloadImages = async () => {
       try {
         const allImages = [
@@ -108,20 +117,14 @@ export default function App() {
       } catch (error) {
         console.log("❌ Erreur lors du préchargement des images :", error);
       } finally {
-        checkAuth();
+        setAppIsReady(true);
       }
     };
-
     preloadImages();
   }, [movies, people]);
 
   const onLayoutRootView = useCallback(() => {
     if (appIsReady) {
-      // This tells the splash screen to hide immediately! If we call this after
-      // `setAppIsReady`, then we may see a blank screen while the app is
-      // loading its initial state and rendering its first pixels. So instead,
-      // we hide the splash screen once we know the root view has already
-      // performed layout.
       SplashScreen.hide();
     }
   }, [appIsReady]);
@@ -132,52 +135,32 @@ export default function App() {
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <GestureHandlerRootView>
-        <SafeAreaProvider>
-          <UserProvider>
-            <PaperProvider>
-              <NavigationContainer>
-                <Stack.Navigator screenOptions={{ headerShown: false }}>
-                  {isAuthenticated ? (
-                    <>
-                      <Stack.Screen name="Main">
-                        {({ navigation }) => (
-                          <View className="flex-1 relative">
-                            <Header
-                              navigation={navigation}
-                              setIsAuthenticated={setIsAuthenticated}
-                            />
-                            <TabNavigator cachedImages={cachedImages} />
-                          </View>
-                        )}
-                      </Stack.Screen>
-                      <Stack.Screen
-                        name="EditProfile"
-                        component={EditProfile}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <Stack.Screen name="AuthScreen">
-                        {() => (
-                          <AuthScreen setIsAuthenticated={setIsAuthenticated} />
-                        )}
-                      </Stack.Screen>
-                      <Stack.Screen name="RegisterScreen">
-                        {() => (
-                          <RegisterScreen
-                            setIsAuthenticated={setIsAuthenticated}
-                          />
-                        )}
-                      </Stack.Screen>
-                    </>
-                  )}
-                </Stack.Navigator>
-              </NavigationContainer>
-            </PaperProvider>
-          </UserProvider>
-        </SafeAreaProvider>
-      </GestureHandlerRootView>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isAuthenticated ? (
+            <>
+              <Stack.Screen name="Main">
+                {({ navigation }) => (
+                  <View className="flex-1 relative">
+                    <Header navigation={navigation} />
+                    <TabNavigator cachedImages={cachedImages} />
+                  </View>
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="EditProfile" component={EditProfile} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="AuthScreen">
+                {() => <AuthScreen />}
+              </Stack.Screen>
+              <Stack.Screen name="RegisterScreen">
+                {() => <RegisterScreen />}
+              </Stack.Screen>
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
     </View>
   );
-}
+};

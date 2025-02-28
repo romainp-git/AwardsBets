@@ -50,6 +50,10 @@
         "projectId": "54c4df91-65b3-42a1-a839-f5576536df68"
       }
     },
-    "owner": "romain_portier"
+    "owner": "romain_portier",
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/54c4df91-65b3-42a1-a839-f5576536df68"
+    }
   }
 }

@@ -24,6 +24,7 @@ import VoteBar from "../components/VoteBar";
 import { getAllVotes, getNominees, getUserVotes } from "../api";
 import { useData } from "../data/data";
 import { Category, Nominee, Vote } from "../types/types";
+import { differenceInDays } from "date-fns";
 
 type PronosticsScreenNavigationProp = StackNavigationProp<{
   PronosticsMain: undefined;
@@ -211,13 +212,17 @@ const PronosticsScreen: React.FC = () => {
   const flatListRef = useRef<FlatList>(null);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<PronosticsScreenNavigationProp>();
-  const { categories } = useData();
+  const { competition, categories } = useData();
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [userVotes, setUserVotes] = useState<Vote[]>([]);
   const [allVotes, setAllVotes] = useState<Vote[]>([]);
   const [nominees, setNominees] = useState<Nominee[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const startDate = new Date(competition?.date || "");
+  const today = new Date();
+  const remainingDays = differenceInDays(startDate, today);
 
   const logoUri = useMemo(
     () =>
@@ -247,7 +252,7 @@ const PronosticsScreen: React.FC = () => {
       setUserVotes(userVotesData.length ? userVotesData : []);
       setAllVotes(allVotesData.length ? allVotesData : []);
     } catch (error) {
-      console.error("Erreur lors de la récupération des votes :", error);
+      console.log("Erreur lors de la récupération des votes :", error);
     } finally {
       setLoading(false);
     }
@@ -258,7 +263,7 @@ const PronosticsScreen: React.FC = () => {
       const nomineesData = await getNominees();
       setNominees(nomineesData);
     } catch (error) {
-      console.error("Erreur lors du chargement des nominés :", error);
+      console.log("Erreur lors du chargement des nominés :", error);
     }
   };
 
@@ -325,8 +330,9 @@ const PronosticsScreen: React.FC = () => {
       {!userVotes.length && (
         <>
           <Text className="text-lg text-center text-white mb-4 px-4">
-            Il reste : xx jour(s) avant la cérémonie de remise de prix. N'oublie
-            pas de compléter tes pronostics !
+            Il reste : {remainingDays > 0 ? remainingDays : "moins d'un"}{" "}
+            jour(s) avant la cérémonie de remise de prix. N'oublie pas de
+            compléter tes pronostics !
           </Text>
           <TouchableOpacity
             onPress={() => navigation.navigate("PronosticsStepper")}
@@ -344,7 +350,7 @@ const PronosticsScreen: React.FC = () => {
       )}
       <FlatList
         showsVerticalScrollIndicator={false}
-        data={categories}
+        data={[...categories].sort((a, b) => a.position - b.position)}
         ref={flatListRef}
         keyExtractor={(category) => category.id}
         contentContainerStyle={{ paddingBottom: insets.bottom + 60 }}
