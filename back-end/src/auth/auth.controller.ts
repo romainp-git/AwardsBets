@@ -22,6 +22,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() signinUserDto: LoginUserDto) {
+    console.log('🛠️ Requête reçue :', signinUserDto);
     return this.authService.authenticate(signinUserDto);
   }
 

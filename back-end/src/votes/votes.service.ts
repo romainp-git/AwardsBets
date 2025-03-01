@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Vote } from './entities/vote.entity';
+import { Vote, VoteType } from './entities/vote.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { Nominee } from 'src/nominees/entities/nominee.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -73,7 +73,51 @@ export class VotesService {
       newVotes.push(newVote);
     }
 
-    return this.voteRepository.save(newVotes);
+    await this.voteRepository.save(newVotes);
+
+    const uniqueCategoryIds = [
+      ...new Set(votes.map((vote) => vote.categoryId)),
+    ];
+    for (const categoryId of uniqueCategoryIds) {
+      await this.updateNomineeOdds(categoryId);
+    }
+  }
+
+  private calculateOdds(votesForNominee: number, totalVotes: number): number {
+    if (totalVotes === 0) return 2;
+
+    const probability = votesForNominee / totalVotes;
+    const rawOdds = 1 / probability;
+
+    return parseFloat(Math.max(1.2, Math.min(rawOdds, 10)).toFixed(1));
+  }
+
+  async updateNomineeOdds(categoryId: number) {
+    const votes = await this.voteRepository.find({
+      where: { category: { id: categoryId }, type: VoteType.WINNER },
+      relations: ['nominee'],
+    });
+
+    const totalVotes = votes.length;
+    const nominees = await this.nomineeRepository.find({
+      where: { category: { id: categoryId } },
+    });
+
+    for (const nominee of nominees) {
+      const nomineeVotes = votes.filter(
+        (vote) => vote.nominee.id === nominee.id,
+      ).length;
+
+      nominee.prevWinnerOdds = nominee.currWinnerOdds;
+      nominee.prevLoserOdds = nominee.currLoserOdds;
+      nominee.currWinnerOdds = this.calculateOdds(nomineeVotes, totalVotes);
+      nominee.currLoserOdds = this.calculateOdds(
+        totalVotes - nomineeVotes,
+        totalVotes,
+      );
+
+      await this.nomineeRepository.save(nominee);
+    }
   }
 
   async findByUser(user: User): Promise<Vote[]> {
@@ -83,7 +127,7 @@ export class VotesService {
     });
   }
 
-  async deleteVote(voteId: number) {
+  async remove(voteId: number) {
     const vote = await this.voteRepository.findOne({ where: { id: voteId } });
 
     if (!vote) {

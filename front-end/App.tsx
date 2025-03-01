@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import "./global.css";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -69,7 +69,6 @@ const MainNavigator = () => {
     }
   }, [expoPushToken]);
 
-  // ✅ Gestion des notifications
   useEffect(() => {
     const notificationListener = Notifications.addNotificationReceivedListener(
       (notification) => {
@@ -123,26 +122,27 @@ const MainNavigator = () => {
     preloadImages();
   }, [movies, people]);
 
-  const onLayoutRootView = useCallback(() => {
-    if (appIsReady) {
-      SplashScreen.hide();
+  useEffect(() => {
+    if (appIsReady && isAuthenticated !== null) {
+      console.log("🚀 Hiding SplashScreen...");
+      SplashScreen.hideAsync();
     }
-  }, [appIsReady]);
+  }, [appIsReady, isAuthenticated]);
 
-  if (!appIsReady) {
+  if (!appIsReady || isAuthenticated === null) {
     return null;
   }
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    <View style={{ flex: 1 }}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {isAuthenticated ? (
             <>
               <Stack.Screen name="Main">
-                {({ navigation }) => (
+                {() => (
                   <View className="flex-1 relative">
-                    <Header navigation={navigation} />
+                    <Header />
                     <TabNavigator cachedImages={cachedImages} />
                   </View>
                 )}
@@ -151,12 +151,8 @@ const MainNavigator = () => {
             </>
           ) : (
             <>
-              <Stack.Screen name="AuthScreen">
-                {() => <AuthScreen />}
-              </Stack.Screen>
-              <Stack.Screen name="RegisterScreen">
-                {() => <RegisterScreen />}
-              </Stack.Screen>
+              <Stack.Screen name="AuthScreen" component={AuthScreen} />
+              <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
             </>
           )}
         </Stack.Navigator>

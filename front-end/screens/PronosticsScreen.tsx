@@ -17,19 +17,14 @@ import Collapsible from "react-native-collapsible";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import CoteCard from "../components/CoteCard";
 import VoteBar from "../components/VoteBar";
 import { getAllVotes, getNominees, getUserVotes } from "../api";
 import { useData } from "../data/data";
-import { Category, Nominee, Vote } from "../types/types";
+import { Category, Nominee, RootStackParamList, Vote } from "../types/types";
 import { differenceInDays } from "date-fns";
-
-type PronosticsScreenNavigationProp = StackNavigationProp<{
-  PronosticsMain: undefined;
-  PronosticsStepper: undefined;
-}>;
+import { StackNavigationProp } from "@react-navigation/stack";
 
 const CategoryHeader: React.FC<{
   category: Category;
@@ -104,9 +99,9 @@ const NomineeItem: React.FC<{
 const UserVotesSection: React.FC<{
   selectedWinner: Nominee;
   selectedLoser: Nominee;
-  navigation: PronosticsScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList>;
 }> = ({ selectedWinner, selectedLoser, navigation }) => (
-  <View className="w-full bg-yellow-600/30 py-3 border border-[#B3984C] flex flex-col mb-3 rounded-md">
+  <View className="w-full bg-yellow-600/30 py-3 border border-yellow-500 flex flex-col mb-3 rounded-md">
     <Text
       className="text-white text-xl text-center mb-2"
       style={{ fontFamily: "FuturaHeavy" }}
@@ -176,14 +171,6 @@ const renderNameItem = (categoryType: string, item: Nominee) => {
         </View>
       );
     case "actor":
-      return (
-        <View>
-          <Text className="text-white text-lg font-bold">
-            {item.team?.map((mp) => mp.person.name).join(", ") || "—"}
-          </Text>
-          <Text className="text-gray-300">{item.movie?.title}</Text>
-        </View>
-      );
     case "other":
       return (
         <View>
@@ -211,10 +198,9 @@ const renderNameItem = (categoryType: string, item: Nominee) => {
 const PronosticsScreen: React.FC = () => {
   const flatListRef = useRef<FlatList>(null);
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<PronosticsScreenNavigationProp>();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const { competition, categories } = useData();
 
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [userVotes, setUserVotes] = useState<Vote[]>([]);
   const [allVotes, setAllVotes] = useState<Vote[]>([]);
   const [nominees, setNominees] = useState<Nominee[]>([]);
@@ -224,6 +210,11 @@ const PronosticsScreen: React.FC = () => {
   const today = new Date();
   const remainingDays = differenceInDays(startDate, today);
 
+  const sortedCategories = [...categories].sort(
+    (a, b) => a.position - b.position
+  );
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
   const logoUri = useMemo(
     () =>
       "https://cdn.freelogovectors.net/wp-content/uploads/2023/01/oscar_logo-freelogovectors.net_.png",
@@ -232,7 +223,9 @@ const PronosticsScreen: React.FC = () => {
 
   useEffect(() => {
     if (categories.length > 0) {
-      setActiveCategory(categories[0].id);
+      const firstCategoryId =
+        sortedCategories.length > 0 ? sortedCategories[0].id : null;
+      setActiveCategory(firstCategoryId);
     }
   }, [categories]);
 
@@ -271,8 +264,11 @@ const PronosticsScreen: React.FC = () => {
     setActiveCategory((prev) => (prev === categoryId ? null : categoryId));
     setTimeout(() => {
       if (flatListRef.current) {
+        const index = sortedCategories.findIndex(
+          (cat) => cat.id === categoryId
+        );
         flatListRef.current.scrollToIndex({
-          index: categories.findIndex((cat) => cat.id === categoryId),
+          index,
           animated: true,
         });
       }
@@ -386,7 +382,9 @@ const PronosticsScreen: React.FC = () => {
                 toggleCategory={toggleCategory}
                 logoUri={logoUri}
               />
-              <Collapsible collapsed={activeCategory !== category.id}>
+              <Collapsible
+                collapsed={activeCategory !== sortedCategories[index].id}
+              >
                 <View className="px-2 pt-3">
                   {selectedWinner && selectedLoser && (
                     <UserVotesSection

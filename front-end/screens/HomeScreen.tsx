@@ -29,15 +29,15 @@ export default function HomeScreen({
   const { competition, categories, movies, error } = useData();
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
+  const openMovieDetails = (movie: Movie) => {
+    setSelectedMovie(movie);
+  };
+
   const formatDateOptions: Intl.DateTimeFormatOptions = {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
-  };
-
-  const openMovieDetails = (movie: Movie) => {
-    setSelectedMovie(movie);
   };
 
   useFocusEffect(
@@ -55,7 +55,7 @@ export default function HomeScreen({
     return {
       height: withTiming(Math.max(0, headerHeight - scrollY.value), {
         duration: 0,
-      }), // ⚡ ZÉRO latence
+      }),
     };
   });
 
@@ -76,9 +76,9 @@ export default function HomeScreen({
 
   // ✅ Trier les films par nombre de nominations et récupérer le top 5
   const topNominatedMovies = Object.entries(nominationsCount)
-    .sort((a, b) => b[1] - a[1]) // Trier du plus grand au plus petit
-    .slice(0, 5) // Prendre les 5 premiers
-    .map(([movieId]) => movies[movieId]); // Récupérer les objets Movie
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([movieId]) => movies[movieId]);
 
   return (
     <View className="bg-zinc-900 flex-1 relative">

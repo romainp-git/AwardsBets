@@ -91,7 +91,10 @@ export interface League {
   id: string;
   name: string;
   members: string[];
-  competitions: string[];
+  logo?: string;
+  status: string;
+  citation?: string;
+  competition: Competition;
 }
 
 export type RootStackParamList = {
@@ -99,6 +102,12 @@ export type RootStackParamList = {
   EditProfile: undefined;
   RegisterScreen: undefined;
   AuthScreen: undefined;
+  LeaguesIndex: undefined;
+  LeaguesShow: { league: League };
+  LeaguesStepper: undefined;
+  CreateLeague: undefined;
+  PronosticsMain: undefined;
+  PronosticsStepper: undefined;
 };
 
 export enum ListType {
@@ -106,3 +115,14 @@ export enum ListType {
   WATCHED = "WATCHED",
   WATCHLIST = "WATCHLIST",
 }
+
+export const staticLogos = [
+  { name: "logo1", source: require("../assets/adaptive-icon.png") },
+  { name: "logo1", source: require("../assets/adaptive-icon.png") },
+  { name: "logo1", source: require("../assets/adaptive-icon.png") },
+  { name: "logo1", source: require("../assets/adaptive-icon.png") },
+  { name: "logo1", source: require("../assets/adaptive-icon.png") },
+  { name: "logo1", source: require("../assets/adaptive-icon.png") },
+  { name: "logo1", source: require("../assets/adaptive-icon.png") },
+  { name: "logo1", source: require("../assets/adaptive-icon.png") },
+];

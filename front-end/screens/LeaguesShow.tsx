@@ -23,9 +23,7 @@ export default function LeaguesShow() {
       <Text className="text-gray-400">
         Membres: {league.members.join(", ")}
       </Text>
-      <Text className="text-gray-400">
-        {league.competitions.length} compétitions
-      </Text>
+      <Text className="text-gray-400">{league.competition.name}</Text>
     </View>
   );
 }

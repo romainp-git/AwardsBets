@@ -16,15 +16,13 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
 import { useUser } from "../context/UserContext";
 import { useAuth } from "../context/AuthContext";
+import { useNavigation } from "@react-navigation/native";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
-type HeaderProps = {
-  navigation: StackNavigationProp<RootStackParamList, "Main">;
-};
-
-const Header: React.FC<HeaderProps> = ({ navigation }) => {
+const Header: React.FC = () => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const slideAnim = useRef(new Animated.Value(screenWidth)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;

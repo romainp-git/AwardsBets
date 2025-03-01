@@ -27,9 +27,9 @@ api.interceptors.response.use(
           [{ text: "OK" }]
         );
       }
-    }
 
-    globalLogout?.();
+      globalLogout?.();
+    }
 
     return Promise.reject(error);
   }
@@ -315,6 +315,69 @@ export const getUserList = async (type: ListType) => {
     return response.data;
   } catch (error) {
     console.log("❌ Erreur lors de la récupération de la liste :", error);
+    return [];
+  }
+};
+
+// 📌 Créer une ligue
+export const CreateLeague = async (leagueData: any) => {
+  try {
+    const token = await getToken();
+    if (!token) throw new Error("Aucun token JWT trouvé");
+
+    const formData = new FormData();
+    formData.append("name", leagueData.name);
+    formData.append("status", leagueData.visibility);
+    formData.append("citation", leagueData.citation || "");
+    formData.append("competitionId", leagueData.competitionId.toString());
+
+    leagueData.members.forEach((id: number) => {
+      formData.append("membersId", id.toString());
+    });
+
+    if (leagueData.logo && leagueData.logo.startsWith("file://")) {
+      const fileUri = leagueData.logo;
+      const fileName = fileUri.split("/").pop();
+
+      formData.append("photo", {
+        uri: fileUri,
+        name: fileName,
+        type: "image/jpeg",
+      } as any);
+    } else {
+      formData.append("logo", leagueData.logo);
+    }
+
+    console.log("🔍 FormData final :", formData);
+
+    const response = await api.post(`${API_BASE_URL}/leagues`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+        Accept: "application/json",
+      },
+    });
+
+    console.log("✅ Ligue créée avec succès :", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Erreur lors de la création de la ligue :", error);
+    throw error;
+  }
+};
+
+// 📌 Récupérer les ligues d’un utilisateur
+export const getUserLeagues = async (userId: number | string) => {
+  console.log("🔍 Récupération des ligues de l'utilisateur :", userId);
+  try {
+    const response = await api.get(
+      `/leagues/users/${userId}`,
+      await getAuthHeaders()
+    );
+    console.log("🔍 Réponse des ligues de l'utilisateur :", response.data);
+    return response.data;
+  } catch (error) {
+    console.log("❌ Erreur lors de la récupération de vos ligues :", error);
     return [];
   }
 };

@@ -33,11 +33,12 @@ export class VotesController {
   @UseGuards(AuthGuard)
   async voteBatch(@Body() votes: VoteDto[], @CurrentUser() user) {
     const formatedVotes: VoteDto[] = Object.values(votes).flat();
-    return this.votesService.voteBatch(user as User, formatedVotes);
+    await this.votesService.voteBatch(user as User, formatedVotes);
+    return { message: 'Votes enregistrés et odds mis à jour' };
   }
 
   @Delete(':id')
-  async deleteVote(@Param('id') voteId: number) {
-    return this.votesService.deleteVote(voteId);
+  async remove(@Param('id') voteId: number) {
+    return this.votesService.remove(voteId);
   }
 }

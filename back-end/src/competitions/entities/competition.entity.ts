@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 import { Nominee } from 'src/nominees/entities/nominee.entity';
+import { League } from 'src/leagues/entities/league.entity';
 
 @Entity()
 export class Competition {
@@ -46,11 +47,12 @@ export class Competition {
   @OneToMany(() => Nominee, (nominee) => nominee.competition, { cascade: true })
   nominees: Nominee[];
 
-  // ✅ Date de création (ajoutée automatiquement)
+  @OneToMany(() => League, (league) => league.competition, { cascade: true })
+  leagues: League[];
+
   @CreateDateColumn()
   createdAt: Date;
 
-  // ✅ Date de dernière mise à jour (mise à jour automatique)
   @UpdateDateColumn()
   updatedAt: Date;
 }

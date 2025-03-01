@@ -1,12 +1,5 @@
 import React, { useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Collapsible from "react-native-collapsible";
@@ -192,7 +185,6 @@ export default function ClassementScreen() {
             <View key={user.id} className="flex-1 items-center relative">
               <View
                 style={{
-                  ...styles.shadow,
                   width: imageSize,
                   height: imageSize,
                   top: imageOffset,
@@ -244,6 +236,7 @@ export default function ClassementScreen() {
 
       <FlatList
         data={sortedUsers}
+        className=" mx-2"
         keyExtractor={(user) => user?.id?.toString() ?? "unknown"}
         contentContainerStyle={{ paddingBottom: insets.bottom + 60 }}
         renderItem={({ item }) => (
@@ -284,8 +277,8 @@ export default function ClassementScreen() {
             </TouchableOpacity>
 
             <Collapsible collapsed={expandedUser !== item?.id}>
-              <View className="bg-zinc-800 p-3 rounded-lg mb-2">
-                <Text className="text-white font-bold text-lg mb-2">
+              <View className="bg-zinc-800 p-3 rounded-lg mb-2 border-yellow-500 border">
+                <Text className="text-white font-bold text-lg">
                   Détail des points
                 </Text>
                 {item?.details.map((detail, index) => {
@@ -327,13 +320,3 @@ export default function ClassementScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  shadow: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-});

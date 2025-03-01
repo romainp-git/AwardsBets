@@ -10,7 +10,7 @@ export const setGlobalLogout = (logoutFn: () => void) => {
 };
 
 interface AuthContextType {
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
@@ -20,7 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<null | boolean>(null);
 
   useEffect(() => {
     const checkToken = async () => {
@@ -46,7 +46,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsAuthenticated(false);
   };
 
-  // 📌 Enregistrer `logout()` globalement pour `api.ts`
   useEffect(() => {
     setGlobalLogout(logout);
   }, [logout]);

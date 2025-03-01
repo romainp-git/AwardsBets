@@ -6,5 +6,6 @@ export class LoginUserDto {
   username: string;
 
   @IsNotEmpty()
+  @IsString()
   password: string;
 }

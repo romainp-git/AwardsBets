@@ -13,6 +13,8 @@ import { VotesModule } from './votes/votes.module';
 
 import { TmdbService } from './tmdb/tmdb.service';
 import { ListsModule } from './lists/lists.module';
+import { LeaguesModule } from './leagues/leagues.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { ListsModule } from './lists/lists.module';
     UsersModule,
     AuthModule,
     VotesModule,
+    LeaguesModule,
+    UploadsModule,
   ],
   providers: [TmdbService],
 })

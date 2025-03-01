@@ -13,7 +13,7 @@ import { deleteUserPhoto, getUserInfos, updateUserProfile } from "../api";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUser } from "../context/UserContext";
 
-const avatars = ["🔥", "🎬", "🍿", "🏆", "🎥"];
+const avatars = ["🔥", "🎬", "🍿", "🏆", "🎥", "📼"];
 const colors = ["#B3984C", "#FF5733", "#3498DB", "#2ECC71", "#9B59B6"];
 
 const EditProfile: React.FC = () => {
@@ -106,10 +106,13 @@ const EditProfile: React.FC = () => {
 
   return (
     <ScrollView
-      className="flex-1 bg-gray-900 px-5 py-8"
+      className="flex-1 bg-zinc-900 px-5 py-8"
       style={{ paddingTop: insets.top + 50 }}
     >
-      <Text className="text-white text-2xl font-bold text-center mb-6">
+      <Text
+        className="text-white text-2xl font-bold text-center mb-6"
+        style={{ fontFamily: "FuturaHeavy" }}
+      >
         Modifier mon profil
       </Text>
 
@@ -128,13 +131,13 @@ const EditProfile: React.FC = () => {
         <View className="flex-row gap-4 mt-4">
           <TouchableOpacity
             onPress={pickImage}
-            className="bg-[#B3984C] py-2 px-4 rounded"
+            className="bg-[#B3984C] py-2 px-4"
           >
-            <Text className="text-white">Choisir une photo</Text>
+            <Text className="text-white text-sm">Choisir une photo</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleDeletePhoto}
-            className={`py-2 px-4 rounded ${
+            className={`py-2 px-4 ${
               photo ? "bg-red-500" : "bg-gray-500 opacity-50"
             }`}
             disabled={!photo}
@@ -144,39 +147,60 @@ const EditProfile: React.FC = () => {
         </View>
       </View>
 
-      <Text className="text-gray-400 mb-2">Adresse e-mail</Text>
+      <Text
+        className="font-bold text-lg text-white mb-2"
+        style={{ fontFamily: "FuturaBook" }}
+      >
+        Adresse e-mail
+      </Text>
       <TextInput
-        className="bg-gray-800 text-white py-3 px-4 rounded mb-4"
+        className="bg-zinc-800 text-white py-3 px-4 mb-4 border border-[#B3984C]"
         value={email}
         textContentType="emailAddress"
         onChangeText={setEmail}
         autoCapitalize="none"
       />
 
-      <Text className="text-gray-400 mb-2">Citation</Text>
+      <Text
+        className="font-bold text-lg text-white mb-2"
+        style={{ fontFamily: "FuturaBook" }}
+      >
+        Citation
+      </Text>
       <TextInput
-        className="bg-gray-800 text-white py-3 px-4 rounded mb-4 h-24"
+        className="bg-zinc-800 text-white py-3 px-4 mb-4 border border-[#B3984C] h-20"
         multiline
         numberOfLines={3}
         placeholder='"A mon signal, déchaîne les enfers !" - Gladiator'
+        placeholderTextColor="#B3B3B3"
         value={description}
         onChangeText={setDescription}
       />
 
-      <Text className="text-gray-400 mb-2">Choisir un avatar</Text>
-      <View className="flex-row gap-4 mb-4">
+      <Text
+        className="font-bold text-lg text-white mb-2"
+        style={{ fontFamily: "FuturaBook" }}
+      >
+        Choisir un avatar
+      </Text>
+      <View className="flex-row gap-4 mb-4 justify-between">
         {avatars.map((emoji) => (
           <TouchableOpacity
             key={emoji}
             onPress={() => setSelectedAvatar(emoji)}
-            className="p-3 rounded bg-gray-700"
+            className="p-3  bg-zinc-800 border border-[#B3984C]"
           >
             <Text className="text-2xl">{emoji}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <Text className="text-gray-400 mb-2">Choisir une couleur de fond</Text>
+      <Text
+        className="font-bold text-lg text-white mb-2"
+        style={{ fontFamily: "FuturaBook" }}
+      >
+        Choisir une couleur de fond
+      </Text>
       <View className="flex-row gap-4 mb-6">
         {colors.map((colorOption) => (
           <TouchableOpacity
@@ -192,7 +216,12 @@ const EditProfile: React.FC = () => {
         onPress={handleSave}
         className="bg-[#B3984C] py-3 items-center"
       >
-        <Text className="text-white font-bold text-lg">Sauvegarder</Text>
+        <Text
+          className="text-white font-bold text-lg"
+          style={{ fontFamily: "FuturaHeavy" }}
+        >
+          Sauvegarder
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity

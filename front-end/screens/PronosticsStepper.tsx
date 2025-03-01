@@ -12,14 +12,7 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
 } from "react-native-reanimated";
-import {
-  deleteVote,
-  getAllVotes,
-  getUserInfos,
-  getUserVotes,
-  submitVotes,
-  updateNomineeOdds,
-} from "../api";
+import { deleteVote, getUserInfos, getUserVotes, submitVotes } from "../api";
 
 export default function PronosticsStepper() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -139,6 +132,10 @@ export default function PronosticsStepper() {
       updatedVotes[category.id] = categoryVotes;
       return updatedVotes;
     });
+
+    if (selectingWinner) {
+      setSelectingWinner(false);
+    }
   };
 
   const isCategoryComplete = () => {
@@ -151,53 +148,6 @@ export default function PronosticsStepper() {
     );
 
     return hasWinner && hasLoser;
-  };
-
-  const calculateOdds = (votesForNominee: number, totalVotes: number) => {
-    if (totalVotes === 0) return 2;
-
-    const probability = votesForNominee / totalVotes;
-    const rawOdds = 1 / probability;
-
-    return parseFloat(Math.max(1.2, Math.min(rawOdds, 10)).toFixed(1));
-  };
-
-  const updateAllNomineesOdds = async (modifiedCategoryIds: string[]) => {
-    try {
-      const allVotesData = await getAllVotes();
-
-      for (const category of categories.filter((cat) =>
-        modifiedCategoryIds.includes(cat.id)
-      )) {
-        const categoryVotes = allVotesData.filter(
-          (vote: Vote) =>
-            vote.type === "winner" && vote.category.id === category.id
-        );
-        const totalVotes = categoryVotes.length;
-        const categoryNominees = category.nominees;
-
-        for (const nominee of categoryNominees) {
-          const nomineeVotes = categoryVotes.filter(
-            (vote: Vote) => vote.nominee.id === nominee.id
-          ).length;
-
-          const newOdds = {
-            prevWinnerOdds: nominee.currWinnerOdds,
-            prevLoserOdds: nominee.currLoserOdds,
-            currWinnerOdds: calculateOdds(nomineeVotes, totalVotes),
-            currLoserOdds: calculateOdds(totalVotes - nomineeVotes, totalVotes),
-          };
-
-          console.log(
-            `🎲 Mise à jour des odds pour ${nominee.movie?.title}:`,
-            newOdds
-          );
-          await updateNomineeOdds(nominee.id, newOdds);
-        }
-      }
-    } catch (error) {
-      console.log("❌ Erreur lors de la mise à jour des odds :", error);
-    }
   };
 
   const cancelVoting = () => {
@@ -221,10 +171,6 @@ export default function PronosticsStepper() {
           await submitVotes(votesToAdd);
         }
 
-        const modifiedCategories = [
-          ...new Set(votesToAdd.map((vote) => vote.category.id)),
-        ];
-        await updateAllNomineesOdds(modifiedCategories);
         navigation.goBack();
       } catch (error) {
         console.log("Erreur lors de l'envoi des votes :", error);
@@ -306,20 +252,12 @@ export default function PronosticsStepper() {
                 )?.person.name || "Réalisateur inconnu"
               }`,
             ];
-          } else if (category.type === "actor") {
-            // Pour une personne, nom + film
-            nomineeTextParts = [
-              nominee.team[0]?.person.name || "Nom inconnu",
-              nominee.movie?.title || "Film inconnu",
-            ];
-          } else if (category.type === "other") {
-            // Pour une personne, nom + film
+          } else if (category.type === "actor" || category.type === "other") {
             nomineeTextParts = [
               nominee.team[0]?.person.name || "Nom inconnu",
               nominee.movie?.title || "Film inconnu",
             ];
           } else if (category.type === "song") {
-            // Pour une chanson, titre + film
             nomineeTextParts = [
               nominee.song || "Titre inconnu",
               nominee.movie?.title || "Film inconnu",
@@ -347,7 +285,7 @@ export default function PronosticsStepper() {
           );
         })}
 
-        <View className="flex-1" style={{ paddingBottom: tabBarHeight }}>
+        <View className="flex-1" style={{ paddingBottom: tabBarHeight + 10 }}>
           <View className="flex-row justify-between mt-4 gap-2">
             {currentIndex > 0 ? (
               <>
@@ -410,7 +348,7 @@ export default function PronosticsStepper() {
             onPress={cancelVoting}
             className="mt-2 py-2 items-center"
           >
-            <Text className="text-gray-400 text-lg underline">Annuler</Text>
+            <Text className="text-white text-md underline">Annuler</Text>
           </TouchableOpacity>
         </View>
       </Animated.ScrollView>

@@ -10,10 +10,12 @@ import {
   UpdateDateColumn,
   OneToMany,
   BeforeInsert,
+  ManyToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Vote } from 'src/votes/entities/vote.entity';
 import { List } from 'src/lists/entities/list.entity';
+import { League } from 'src/leagues/entities/league.entity';
 
 export enum UserStatus {
   ADMIN = 'admin',
@@ -58,6 +60,9 @@ export class User {
 
   @OneToMany(() => Vote, (vote) => vote.user, { cascade: true })
   votes: Vote[];
+
+  @ManyToMany(() => League, (league) => league.members)
+  leagues: League[];
 
   @CreateDateColumn()
   createdAt: Date;

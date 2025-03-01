@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/require-await */
+
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -9,8 +9,6 @@ import {
   Body,
   BadRequestException,
   Get,
-  Param,
-  Res,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -24,30 +22,9 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage, Multer } from 'multer';
-import { extname, join } from 'path';
+import { extname } from 'path';
 
-import { Response } from 'express';
-import { createReadStream, existsSync } from 'fs';
 import { AuthGuard } from 'src/auth/Guards/auth.guard';
-
-@Controller('uploads')
-export class UploadsController {
-  @Get(':filename')
-  async getUploadedFile(
-    @Param('filename') filename: string,
-    @Res() res: Response,
-  ) {
-    const filePath = join(__dirname, '..', '..', 'uploads', filename);
-    console.log('📂 Fichier demandé:', filePath);
-
-    if (!existsSync(filePath)) {
-      return res.status(404).json({ message: 'Fichier introuvable' });
-    }
-
-    const fileStream = createReadStream(filePath);
-    fileStream.pipe(res);
-  }
-}
 
 @Controller('users')
 export class UsersController {
