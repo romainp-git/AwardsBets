@@ -16,18 +16,14 @@ import { getUserLeagues } from "../api";
 import { useUser } from "../context/UserContext";
 
 export default function LeaguessScreen() {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [loading, setLoading] = useState(true);
   const insets = useSafeAreaInsets();
-  const { user } = useUser();
-  const [leagues, setLeagues] = useState<League[]>([]);
   const tabBarHeight = useBottomTabBarHeight();
 
-  const formatDateOptions: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  };
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const { user } = useUser();
+
+  const [leagues, setLeagues] = useState<League[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -92,10 +88,11 @@ export default function LeaguessScreen() {
 
               <Text className="text-gray-400 text-sm">
                 {item.competition.name} - {item.competition.edition} -{" "}
-                {new Date(item.competition.date).toLocaleDateString(
-                  "fr-FR",
-                  formatDateOptions
-                )}
+                {new Date(item.competition.date).toLocaleDateString("fr-FR", {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "numeric",
+                })}
               </Text>
               <Text className="text-gray-400 text-sm">
                 {item.members.length} membres

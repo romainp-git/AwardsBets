@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 
 import { List, ListType } from './entities/list.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Movie } from 'src/movies/entities/movie.entity';
 import { ListItemDto } from './dto/list-item.dto';
 
 @Injectable()
@@ -12,8 +11,6 @@ export class ListsService {
   constructor(
     @InjectRepository(List)
     private readonly listRepository: Repository<List>,
-    @InjectRepository(Movie)
-    private readonly movieRepository: Repository<Movie>,
   ) {}
   async addToList(user: User, listItem: ListItemDto): Promise<List> {
     const newListItem = this.listRepository.create({

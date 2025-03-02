@@ -50,13 +50,11 @@ export class MoviesService {
       tmdbId: movieData.tmdbId,
     });
 
-    // ✅ Sauvegarde du film en base pour récupérer son ID
     const savedMovie = await this.movieRepository.save(movie);
     console.log(`Movie saved with ID: ${savedMovie.id}`);
 
     const team: MoviePerson[] = [];
 
-    // ✅ 3. Ajouter les 10 premiers acteurs
     for (const personData of movieData.credits.cast.slice(0, 10)) {
       console.log(`Importing Actor:`, personData.name);
 
@@ -84,13 +82,12 @@ export class MoviesService {
       team.push(moviePerson);
     }
 
-    // ✅ 4. Ajouter le réalisateur et le scénariste
     for (const personData of movieData.credits.crew) {
       if (Object.keys(VALID_DEPARTMENTS).includes(personData.department)) {
         console.log(`Importing ${personData.job}:`, personData.name);
 
         const role =
-          personData.job.charAt(0).toLowerCase() + personData.job.slice(1); // 🔹 Première lettre en minuscule
+          personData.job.charAt(0).toLowerCase() + personData.job.slice(1);
 
         let person = await this.personRepository.findOne({
           where: { name: personData.name },

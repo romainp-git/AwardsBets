@@ -19,7 +19,7 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ cachedImages }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        animation: "fade",
+        //animation: "fade",
         headerShown: false,
         tabBarActiveTintColor: "white",
         tabBarShowLabel: true,
@@ -78,7 +78,7 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ cachedImages }) => {
             </View>
           );
         },
-        animationEnabled: true,
+        animationEnabled: false,
         tabBarHideOnKeyboard: true,
       })}
     >
@@ -89,7 +89,10 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ cachedImages }) => {
       <Tab.Screen name="Pronostics" component={PronosticsStack} />
       <Tab.Screen name="Ligues" component={LeaguesStack} />
       <Tab.Screen name="Classement" component={ClassementScreen} />
-      <Tab.Screen name="Listes" component={ListsScreen} />
+      <Tab.Screen
+        name="Listes"
+        children={() => <ListsScreen cachedImages={cachedImages} />}
+      />
     </Tab.Navigator>
   );
 };

@@ -254,7 +254,8 @@ export default function PronosticsStepper() {
             ];
           } else if (category.type === "actor" || category.type === "other") {
             nomineeTextParts = [
-              nominee.team[0]?.person.name || "Nom inconnu",
+              nominee.team.map((member) => member.person.name).join(", ") ||
+                "Nom inconnu",
               nominee.movie?.title || "Film inconnu",
             ];
           } else if (category.type === "song") {

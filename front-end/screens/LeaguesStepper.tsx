@@ -507,7 +507,10 @@ export default function CreateLeagueScreen() {
               )}
             </View>
 
-            <TouchableOpacity className="mt-2 py-2 items-center">
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              className="mt-2 py-2 items-center"
+            >
               <Text className="text-white text-md underline">Annuler</Text>
             </TouchableOpacity>
           </View>

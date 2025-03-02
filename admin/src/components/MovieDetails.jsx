@@ -1,26 +1,27 @@
-import { useState } from 'react';
-import { importMovie } from '../api';
-import { IonIcon } from '@ionic/react';
-import { closeCircleOutline } from 'ionicons/icons';
+import { useState } from "react";
+import { importMovie } from "../api";
+import { IonIcon } from "@ionic/react";
+import { closeCircleOutline } from "ionicons/icons";
 
-import '../styles/MovieDetails.css';
+import "../styles/MovieDetails.css";
 
 const VALID_DEPARTMENTS = {
-  "Directing": "Réalisation",
-  "Writing": "Scénario",
-  "Production": "Production",
-  "Editing": "Montage",
-  "Sound": "Son",
+  Directing: "Réalisation",
+  Writing: "Scénario",
+  Production: "Production",
+  Editing: "Montage",
+  Sound: "Son",
+  Art: "Art",
   "Visual Effects": "Effets Visuels",
   "Costume & Make-Up": "Costumes & Maquillage",
-  "Camera": "Image",
+  Camera: "Image",
 };
 
 const MovieDetails = ({ movie, onCancel }) => {
   const [selectedImages, setSelectedImages] = useState({
-    backdrop: movie.images.backdrops[0] || '',
-    poster: movie.images.posters[0] || '',
-    logo: movie.images.logos[0] || '',
+    backdrop: movie.images.backdrops[0] || "",
+    poster: movie.images.posters[0] || "",
+    logo: movie.images.logos[0] || "",
   });
 
   const handleImageSelection = (type, imageUrl) => {
@@ -42,7 +43,7 @@ const MovieDetails = ({ movie, onCancel }) => {
       tmdbId: movie.id,
     });
 
-    alert('Film importé avec succès !');
+    alert("Film importé avec succès !");
     onCancel();
   };
 
@@ -52,7 +53,9 @@ const MovieDetails = ({ movie, onCancel }) => {
         <IonIcon icon={closeCircleOutline} />
       </button>
 
-      <h2>{movie.title} ({movie.release_date?.split('-')[0]})</h2>
+      <h2>
+        {movie.title} ({movie.release_date?.split("-")[0]})
+      </h2>
       <p>Genres</p>
       <div className="movie-genres">
         {movie.genres.map((genre) => genre.name).join(", ")}
@@ -65,11 +68,11 @@ const MovieDetails = ({ movie, onCancel }) => {
           <h4>Backdrop</h4>
           <div className="image-grid">
             {movie.images.backdrops.map((img, index) => (
-              <img 
-                key={index} 
-                src={img} 
-                alt="Backdrop" 
-                onClick={() => handleImageSelection('backdrop', img)}
+              <img
+                key={index}
+                src={img}
+                alt="Backdrop"
+                onClick={() => handleImageSelection("backdrop", img)}
                 className={selectedImages.backdrop === img ? "selected" : ""}
               />
             ))}
@@ -80,11 +83,11 @@ const MovieDetails = ({ movie, onCancel }) => {
           <h4>Poster</h4>
           <div className="image-grid">
             {movie.images.posters.map((img, index) => (
-              <img 
-                key={index} 
-                src={img} 
-                alt="Poster" 
-                onClick={() => handleImageSelection('poster', img)}
+              <img
+                key={index}
+                src={img}
+                alt="Poster"
+                onClick={() => handleImageSelection("poster", img)}
                 className={selectedImages.poster === img ? "selected" : ""}
               />
             ))}
@@ -95,11 +98,11 @@ const MovieDetails = ({ movie, onCancel }) => {
           <h4>Logo</h4>
           <div className="image-grid">
             {movie.images.logos.map((img, index) => (
-              <img 
-                key={index} 
-                src={img} 
-                alt="Logo" 
-                onClick={() => handleImageSelection('logo', img)}
+              <img
+                key={index}
+                src={img}
+                alt="Logo"
+                onClick={() => handleImageSelection("logo", img)}
                 className={selectedImages.logo === img ? "selected" : ""}
               />
             ))}
@@ -111,7 +114,10 @@ const MovieDetails = ({ movie, onCancel }) => {
       <div className="cast-grid">
         {movie.credits.cast.slice(0, 10).map((actor, index) => (
           <div key={index} className="cast-card">
-            <img src={`https://image.tmdb.org/t/p/h632${actor.profile_path}`} alt={actor.name} />
+            <img
+              src={`https://image.tmdb.org/t/p/h632${actor.profile_path}`}
+              alt={actor.name}
+            />
             <p>{actor.name}</p>
           </div>
         ))}
@@ -120,16 +126,23 @@ const MovieDetails = ({ movie, onCancel }) => {
       <h3>Équipe technique</h3>
       <div className="crew-list">
         {movie.credits.crew
-          .filter(person => Object.keys(VALID_DEPARTMENTS).includes(person.department))
+          .filter((person) =>
+            Object.keys(VALID_DEPARTMENTS).includes(person.department)
+          )
           .map((person, index) => (
             <p key={index}>
-              <strong>{VALID_DEPARTMENTS[person.department]} :</strong> {person.name} ({person.job})
+              <strong>{VALID_DEPARTMENTS[person.department]} :</strong>{" "}
+              {person.name} ({person.job})
             </p>
-        ))}
+          ))}
       </div>
 
-      <button className="import-btn" onClick={handleImport}>Importer le film</button>
-      <button className="cancel-btn" onClick={onCancel}>Annuler</button>
+      <button className="import-btn" onClick={handleImport}>
+        Importer le film
+      </button>
+      <button className="cancel-btn" onClick={onCancel}>
+        Annuler
+      </button>
     </div>
   );
 };

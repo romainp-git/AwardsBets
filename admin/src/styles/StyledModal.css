@@ -26,8 +26,49 @@
   flex-direction: column;
 }
 
+.modal-container .movie-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* ✅ Style des tags */
+.modal-container .movie-tag {
+  background: #444;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.modal-container .movie-tag:hover {
+  background: #666;
+  transform: scale(1.05);
+}
+
+/* ✅ Film sélectionné mis en avant */
+.modal-container .movie-tag.selected {
+  background: #b3984c;
+  color: black;
+  font-weight: bold;
+  border: 2px solid white;
+}
+
+.modal-container .selected-movie {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font-size: 1rem;
+  text-align: center;
+}
+
 /* Liste des personnes avec une hauteur max et un scroll */
-.person-list {
+.modal-container .person-list {
   max-height: 200px; /* Hauteur fixe pour éviter qu'elle dépasse */
   overflow-y: auto; /* Ajout du scroll si la liste est trop longue */
   border: 1px solid #ccc;
@@ -39,7 +80,7 @@
   gap: 5px;
 }
 
-.person-tag {
+.modal-container .person-tag {
   background: #444;
   color: white;
   padding: 5px 10px;
@@ -49,19 +90,19 @@
   transition: background 0.2s;
 }
 
-.person-tag:hover {
+.modal-container .person-tag:hover {
   background: #666;
 }
 
 /* Tags sélectionnés */
-.selected-tags {
+.modal-container .selected-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin: 10px 0;
 }
 
-.selected-tag {
+.modal-container .selected-tag {
   background: #b3984c;
   color: white;
   padding: 5px 10px;
@@ -71,7 +112,7 @@
   font-size: 0.75rem;
 }
 
-.remove-tag {
+.modal-container .remove-tag {
   background: none;
   border: none;
   color: red;
@@ -80,14 +121,14 @@
 }
 
 /* Boutons */
-.modal-actions {
+.modal-container .modal-actions {
   display: flex;
   justify-content: end;
   margin-top: 15px;
 }
 
-.validate-btn,
-.cancel-btn {
+.modal-container .validate-btn,
+.modal-container .cancel-btn {
   padding: 10px 20px;
   border-radius: 5px;
   border: none;
@@ -95,20 +136,20 @@
   transition: 0.2s;
 }
 
-.validate-btn {
+.modal-container .validate-btn {
   background: #28a745;
   color: white;
 }
 
-.validate-btn:hover {
+.modal-container .validate-btn:hover {
   background: #218838;
 }
 
-.cancel-btn {
+.modal-container .cancel-btn {
   background: #dc3545;
   color: white;
 }
 
-.cancel-btn:hover {
+.modal-container .cancel-btn:hover {
   background: #c82333;
 }

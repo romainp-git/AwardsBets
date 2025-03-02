@@ -24,7 +24,7 @@ export class TmdbService {
   }
 
   async searchMovies(query: string) {
-    const url = `${this.baseUrl}/search/movie?query=${encodeURIComponent(query)}&language=fr-FR`;
+    const url = `${this.baseUrl}/search/movie?query=${encodeURIComponent(query)}&language=en-EN`;
 
     try {
       const response = await axios.get(url, this.getHeaders());
@@ -39,13 +39,17 @@ export class TmdbService {
   }
 
   async getMovieDetails(movieId: number) {
-    const url = `${this.baseUrl}/movie/${movieId}?language=fr-FR&append_to_response=credits`;
+    const url = `${this.baseUrl}/movie/${movieId}?language=en-EN&append_to_response=credits`;
 
     try {
       const response = await axios.get(url, this.getHeaders());
-      console.log('réponse', response.data); // Vérifie la structure
-      console.log('runtime', response.data.runtime); // Devrait afficher 141
-      return response.data;
+      const movieData = response.data;
+      const frenchTitle = await this.getMovieTranslation(movieId);
+
+      return {
+        ...movieData,
+        title: frenchTitle || movieData.title,
+      };
     } catch (error) {
       console.error(
         'Erreur lors de la récupération des détails du film:',
@@ -54,6 +58,27 @@ export class TmdbService {
       throw new Error(
         'Impossible de récupérer les détails du film depuis TMDB.',
       );
+    }
+  }
+
+  async getMovieTranslation(movieId: number) {
+    const url = `${this.baseUrl}/movie/${movieId}/translations`;
+
+    try {
+      const response = await axios.get(url, this.getHeaders());
+      const translations = response.data.translations;
+
+      const frenchTranslation = translations.find(
+        (t) => t.iso_639_1 === 'fr' || t.iso_3166_1 === 'FR',
+      );
+
+      return frenchTranslation?.data?.title || null;
+    } catch (error) {
+      console.error(
+        'Erreur lors de la récupération des traductions:',
+        error.response?.data || error.message,
+      );
+      return null;
     }
   }
 
